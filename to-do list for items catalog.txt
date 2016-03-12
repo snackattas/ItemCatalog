@@ -1,0 +1,28 @@
+client ID
+992424767516419
+
+client secret
+6c5c078304d1ddda091d9e2cea65a2d6\
+
+ideas:
+restaurant/menu splash screen using jinjaq2, enumerate python function to create a new line after every third thing
+col(4)
+-where to put javascript?  In main? In footer?
+-can I have a separate python file for oauth stuff
+-can I have a separate folder directory for client_secrets
+-login page
+-instructional videos on foundations
+- http://thefoxisblack.com/desktop-wallpaper/travis-ladue-desktop-2560x1440.jpeghttp://starwallpapers.com/walls/mood_things_notebook_stationery_hd_wallpaper-wide.jpg
+- better image entry for item/category
+- ajax request for loading items to pages
+- latest item functionality? Can you do a sqlalchemy request that combines category and item tables and sorts by latest?
+- Logout button
+- cool login screen
+
+- add bleach support!
+
+
+
+STEPS
+Consolidate disconnect functions and put them in header!
+categorify all files!
