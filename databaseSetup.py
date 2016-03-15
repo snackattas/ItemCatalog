@@ -33,7 +33,7 @@ class Category(Base):
        }
 
 class Item(Base):
-    __tablename__ = 'menu_item'
+    __tablename__ = 'item'
 
     id = Column(Integer, primary_key = True)
     name =Column(String(80), nullable = False)

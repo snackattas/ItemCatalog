@@ -26,3 +26,5 @@ col(4)
 STEPS
 Consolidate disconnect functions and put them in header!
 categorify all files!
+
+- double check flash messages, make sure they have appropriate string substitution
