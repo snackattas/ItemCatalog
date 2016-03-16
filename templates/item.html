@@ -1,6 +1,6 @@
 {% extends "main.html" %}
 {% block content %}
-{% include "header.html" %}
+{% include "loggedInHeader.html" %}
 	<div class="row divider green">
 		<div class="col-md-12"></div>
 	</div>
@@ -29,6 +29,7 @@
     {% endwith %}
 
 </div>
+{% if creator.id == user_id %}
 	<div class="row padding-top padding-bottom">
 		<div class="col-md-1"></div>
 		<div class="col-md-11 padding-none">
@@ -50,6 +51,7 @@
 		</div>
 		<div class="col-md-7"></div>
 	</div>
+{% endif %}
 
 	{% if items !=[] %}
 		<div class="row">
@@ -60,12 +62,23 @@
 						<div class="menu-item">
 						<h3>{{item.name}}</h3>
 						<p>{{item.description}}</p>
-						<a href='{{url_for('editItem', category_id = category.id, item_id=i.id ) }}'>Edit</a> |
-						<a href='{{url_for('deleteItem', category_id = category.id, item_id=i.id ) }}'>Delete</a>
+						{% if creator.id == user_id %}
+							<a href="{{url_for('editItem', category_id = category.id, item_id=item.id ) }}">Edit</a> |
+							<a href="{{url_for('deleteItem', category_id = category.id, item_id=item.id ) }}">Delete</a>
+						{% endif %}
 						</div>
 					{% endfor %}
 			</div>
 			<div class="col-md-1"></div>
 		</div>
+	{% endif %}
+	{% if items == [] %}
+	<div class="row">
+		<div class="col-md-1"></div>
+		<div class="col-md-3">
+			<h2>No items logged yet</h2>
+		</div>
+		<div class="col-md-1"></div>
+	</div>
 	{% endif %}
 {% endblock %}

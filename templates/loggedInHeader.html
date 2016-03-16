@@ -6,8 +6,9 @@
 	</div>
 	<div class="col-md-6 text-right">
 		<figure class="creator">
-			<img src="{{login_session["picture"]}}">
+			<img src="{{login_session['picture']}}">
 			<figcaption>{{login_session["username"]}}</figcaption>
+			<a href="{{url_for('disconnect')}}">Log Out</a>
 		</figure>
 	</div>
 </div>

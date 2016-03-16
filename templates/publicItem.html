@@ -1,6 +1,6 @@
 {% extends "main.html" %}
 {% block content %}
-{% include "header.html" %}
+{% include "defaultHeader.html" %}
 
 	<div class="row divider green">
 		<div class="col-md-12"></div>
@@ -50,5 +50,14 @@
 			</div>
 			<div class="col-md-1"></div>
 		</div>
+	{% endif %}
+	{% if items == [] %}
+	<div class="row">
+		<div class="col-md-1"></div>
+		<div class="col-md-3">
+			<h2>No items logged yet</h2>
+		</div>
+		<div class="col-md-1"></div>
+	</div>
 	{% endif %}
 {% endblock %}

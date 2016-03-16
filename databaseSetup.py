@@ -1,8 +1,9 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, LargeBinary, DateTime
+from sqlalchemy import Column, ForeignKey, Integer, String, LargeBinary, DateTime, BigInteger
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy import create_engine
 Base = declarative_base()
+import datetime
 
 
 class User(Base):
@@ -12,6 +13,8 @@ class User(Base):
     name = Column(String(80), nullable = False)
     email = Column(String(80))
     picture = Column(LargeBinary)
+    facebook_id = Column(String(80))
+    gplus_id = Column(String(80))
 
 class Category(Base):
     __tablename__ = 'category'
@@ -21,7 +24,7 @@ class Category(Base):
     user_id = Column(Integer, ForeignKey('user.id'))
     user = relationship(User)
     picture = Column(LargeBinary)
-    instant_of_creation = Column(DateTime)
+    instant_of_creation = Column(DateTime, default=datetime.datetime.utcnow)
 
     @property
     def serialize(self):
@@ -43,7 +46,7 @@ class Item(Base):
     user_id = Column(Integer, ForeignKey('user.id'))
     user = relationship(User)
     picture = Column(LargeBinary)
-    instant_of_creation = Column(DateTime)
+    instant_of_creation = Column(DateTime, default=datetime.datetime.utcnow)
 
     @property
     def serialize(self):

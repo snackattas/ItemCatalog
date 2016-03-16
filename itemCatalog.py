@@ -20,16 +20,50 @@ session = DBSession()
 
 
 def createUser(login_session):
-    newUser = User(name = login_session['username'], email = login_session['email'], picture = login_session['picture'])
+    user = getUserID(login_session)
+    if user:
+        if login_session.get('facebook_id'):
+            ### might be dot syntax for adding here
+            user.facebook_id = login_session['facebook_id']
+            user_id = user.id
+        if login_session.get('gplus_id'):
+            user.gplus_id = login_session['gplus_id']
+            user_id = user.id
+        session.add(user)
+        session.commit()
+        return user_id
+    if login_session.get('facebook_id'):
+        newUser = User(name = login_session['username'], email = login_session['email'], picture = login_session['picture'], facebook_id=login_session['facebook_id'])
+    if login_session.get('gplus_id'):
+        newUser = User(name = login_session['username'], email = login_session['email'], picture = login_session['picture'], gplus_id=login_session['gplus_id'])
+    session.add(newUser)
+    session.commit()
+    return getUserID(login_session).id
+
     session.add(newUser)
     session.commit()
     user = session.query(User).filter_by(email = login_session['email']).one()
     return user.id
 
-def getUserID(email):
+def getFacebookUserID(login_session):
     try:
-        user = session.query(User).filter_by(email = email).one()
+        user = session.query(User).filter_by(email=login_session.get('email'), facebook_id=login_session.get('facebook_id')).one()
         return user.id
+    except:
+        return None
+
+def getGoogleUserID(login_session):
+    try:
+        user = session.query(User).filter_by(email=login_session.get('email'), gplus_id=login_session.get('gplus_id')).one()
+        return user.id
+    except:
+        return None
+
+def getUserID(login_session):
+    try:
+        ### is it a good idea to pass along a query object through functions?
+        user = session.query(User).filter_by(email=login_session.get('email')).one()
+        return user
     except:
         return None
 
@@ -41,7 +75,7 @@ def getUserInfo(user_id):
         return None
 
 # Create anti-forgery state token
-@app.route('/login')
+@app.route('/login/')
 def showLogin():
     state = ''.join(random.choice(string.ascii_uppercase + string.digits)
                     for x in xrange(32))
@@ -85,7 +119,7 @@ def fbconnect():
     login_session['picture'] = data["data"]["url"]
 
     # see if user exists
-    user_id = getUserID(login_session['email'])
+    user_id = getFacebookUserID(login_session)
     if not user_id:
         user_id = createUser(login_session)
     login_session['user_id'] = user_id
@@ -168,7 +202,7 @@ def gconnect():
     login_session['email'] = data['email']
     login_session['picture'] = data['picture']
     # see if user exists, if user doesn't, make a new one
-    user_id = getUserID(login_session['email'])
+    user_id = getGoogleUserID(login_session)
     if not user_id:
         user_id = createUser(login_session)
     login_session['user_id'] = user_id
@@ -183,7 +217,6 @@ def gconnect():
     ("you are now logged in as %s" % login_session['username'])
     return output # this should be a login template!
 
-@app.route('/gdisconnect')
 def gdisconnect():
     url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % login_session['access_token']
     h = httplib2.Http()
@@ -197,7 +230,6 @@ def gdisconnect():
     	response.headers['Content-Type'] = 'application/json'
     	return response
 
-@app.route('/fbdisconnect')
 def fbdisconnect():
     facebook_id = login_session['facebook_id']
     # The access token must me included to successfully logout
@@ -207,13 +239,13 @@ def fbdisconnect():
     result = h.request(url, 'DELETE')[1]
     return "you have been logged out"
 
-@app.route('/disconnect')
+@app.route('/disconnect/')
 def disconnect():
     if 'provider' in login_session:
         if login_session['provider'] == 'google':
             gdisconnect()
             del login_session['gplus_id']
-            del login_session['credentials']
+            #del login_session['credentials']
         if login_session['provider'] == 'facebook':
             fbdisconnect()
             del login_session['facebook_id']
@@ -257,20 +289,20 @@ def showCategory():
     if 'username' not in login_session:
         return redirect(url_for('showPublicCategory'))
     categories = session.query(Category).order_by(asc(Category.name))
-    return render_template('category.html', categories=categories, login_session=login_session)
+    return render_template('category.html', categories=categories, login_session=login_session, no_categories=isinstance(categories, list))
 
 # Public face of Restaurant database
 @app.route('/')
 @app.route('/publicCategory/')
 def showPublicCategory():
     categories = session.query(Category).order_by(asc(Category.name))
-    return render_template('publicCategory.html', categories=categories)
+    return render_template('publicCategory.html', categories=categories, no_categories=isinstance(categories, list))
 
-@app.route('/publicCategory/<int:category_id>/publicItem')
+@app.route('/publicCategory/<int:category_id>/publicItem/')
 def showPublicItem(category_id):
     category = session.query(Category).filter_by(id=category_id).one()
     items = session.query(Item).filter_by(
-        category_id=categpry.id).all()
+        category_id=category.id).all()
     creator = getUserInfo(category.user_id)
     return render_template('publicItem.html', items=items, category=category, creator=creator)
 
@@ -296,7 +328,7 @@ def editCategory(category_id):
     user_id = category.user_id
     ### I have a feeling this will need to be reworked
     if user_id != login_session['user_id']:
-        return redirect(url_for('showPublicCategory'))
+        return redirect(url_for('showCategory'))
     editedCategory = session.query(
         Category).filter_by(id=category_id).one()
     if request.method == 'POST':
@@ -312,39 +344,45 @@ def editCategory(category_id):
 def deleteCategory(category_id):
     if 'username' not in login_session:
         return redirect(url_for('showPublicCategory'))
-    categoryToDelete = session.query(
+    category_to_delete = session.query(
         Category).filter_by(id=category_id).one()
+    user_id = category_to_delete.user_id
+    if user_id != login_session['user_id']:
+        return redirect(url_for('showCategory'))
     if request.method == 'POST':
-        session.delete(categoryToDelete)
-        flash('%s Successfully Deleted' % categoryToDelete.name)
+        session.delete(category_to_delete)
+        flash('%s Successfully Deleted' % category_to_delete.name)
         session.commit()
         return redirect(url_for('showCategory', category_id=category_id))
     else:
-        return render_template('deleteCategory.html', category=categoryToDelete, login_session=login_session)
+        return render_template('deleteCategory.html', category=category_to_delete, login_session=login_session)
 
 # Show a category's item
 @app.route('/category/<int:category_id>/')
-@app.route('/category/<int:category_id>/menu/')
+@app.route('/category/<int:category_id>/item/')
 def showItem(category_id):
     if 'username' not in login_session:
-        return redirect(url_for('showPublicItem', category_id=category_id))
+        return redirect(url_for('showPublicCategory'))
     category = session.query(Category).filter_by(id=category_id).one()
     items = session.query(Item).filter_by(category_id=category_id).all()
     creator = getUserInfo(category.user_id)
-    return render_template('item.html', items=items, category=category, login_session=login_session, creator=creator)
+    return render_template('item.html', items=items, category=category, login_session=login_session, creator=creator, user_id=login_session['user_id'])
 
 # Create a new item
 @app.route('/category/<int:category_id>/item/new/', methods=['GET', 'POST'])
 def newItem(category_id):
     if 'username' not in login_session:
-        return redirect(url_for('showPublicItem', category_id=category_id))
+        return redirect(url_for('showPublicCategory'))
     category = session.query(Category).filter_by(id=category_id).one()
+    user_id = category.user_id
+    if user_id != login_session['user_id']:
+        return redirect(url_for('showCategory'))
     if request.method == 'POST':
         newItem = Item(name=request.form['name'], description=request.form[
                            'description'], category_id=category_id)
         session.add(newItem)
         session.commit()
-        flash('New Menu %s Item Successfully Created' % (newItem.name))
+        flash('New Item %s Successfully Created' % (newItem.name))
         return redirect(url_for('showItem', category_id=category_id))
     else:
         return render_template('newItem.html', category=category, login_session=login_session)
@@ -353,15 +391,17 @@ def newItem(category_id):
 @app.route('/category/<int:category_id>/item/<int:item_id>/edit/', methods=['GET', 'POST'])
 def editItem(category_id, item_id):
     if 'username' not in login_session:
-        return redirect(url_for('showPublicItem', category_id=category_id))
-    editedItem = session.query(Item).filter_by(id=item_id).one()
-    category = session.query(Category).filter_by(id=category_id).one()
+        return redirect(url_for('showPublicCategory'))
+    edited_item = session.query(Item).filter_by(id=item_id, category_id=category_id).one()
+    user_id = edited_item.user_id
+    if user_id != login_session['user_id']:
+        return redirect(url_for('showCategory'))
     if request.method == 'POST':
         if request.form['name']:
-            editedItem.name = request.form['name']
+            edited_item.name = request.form['name']
         if request.form['description']:
-            editedItem.description = request.form['description']
-        session.add(editedItem)
+            edited_item.description = request.form['description']
+        session.add(edited_item)
         session.commit()
         flash('Item Successfully Edited')
         return redirect(url_for('showItem', category_id=category_id))
@@ -372,16 +412,21 @@ def editItem(category_id, item_id):
 @app.route('/category/<int:category_id>/item/<int:item_id>/delete/', methods=['GET', 'POST'])
 def deleteItem(category_id, item_id):
     if 'username' not in login_session:
-        return redirect(url_for('showPublicItem', category_id=category_id))
-    category = session.query(Category).filter_by(id=category_id).one()
-    itemToDelete = session.query(Item).filter_by(id=item_id).one()
+        return redirect(url_for('showPublicCategory'))
+    item_to_delete = session.query(Item).filter_by(id=item_id, category_id=category_id).one()
+    user_id = item_to_delete.user_id
+    print 'user_id'+str(user_id)
+    print login_session['user_id']
+
+    if user_id != login_session['user_id']:
+        return redirect(url_for('showCategory'))
     if request.method == 'POST':
-        session.delete(itemToDelete)
+        session.delete(item_to_delete)
         session.commit()
         flash('Item Successfully Deleted')
-        return redirect(url_for('showMenu', category_id=category_id))
+        return redirect(url_for('showItem', category_id=category_id))
     else:
-        return render_template('deleteItem.html', item=itemToDelete, login_session=login_session)
+        return render_template('deleteItem.html', item=item_to_delete, login_session=login_session)
 
 
 if __name__ == '__main__':

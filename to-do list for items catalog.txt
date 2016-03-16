@@ -1,9 +1,3 @@
-client ID
-992424767516419
-
-client secret
-6c5c078304d1ddda091d9e2cea65a2d6\
-
 ideas:
 restaurant/menu splash screen using jinjaq2, enumerate python function to create a new line after every third thing
 col(4)
@@ -28,3 +22,6 @@ Consolidate disconnect functions and put them in header!
 categorify all files!
 
 - double check flash messages, make sure they have appropriate string substitution
+- move the category edit name to the category screen. Also create a delete category function/link, put it in the same place
+-block against null entries. Maybe do it in javascript!
+-maybe some kind of style switch on the category page to indicate that I've created a category?
