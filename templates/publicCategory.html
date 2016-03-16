@@ -31,6 +31,16 @@
 	<div class="col-md-10 padding-none"></div>
 	<div class="col-md-1"></div>
 </div>
+<ul>
+{% for category_and_item in latest_additions %}
+	{% if category_and_item.type == 'category' %}
+		<li>Category <i>{{category_and_item.name}}</i> Added at {{category_and_item.instant_of_creation}}</li>
+	{% endif %}
+	{% if category_and_item.type == 'item' %}
+	<li>Item <i>{{category_and_item.name}}</i> Added to <i>{{category_and_item.category_id}}</i> at  {{category_and_item.instant_of_creation}}</li>
+	{% endif %}
+{% endfor %}
+</ul>
 
 {% for category in categories %}
 	<a href = "{{ url_for('showPublicItem', category_id = category.id) }}">
@@ -43,7 +53,7 @@
 		</div>
 	</a>
 {% endfor %}
-{% if no_categories == False %}
+{% if no_categories == True %}
 	<div class="row">
 		<div class="col-md-1"></div>
 			<div class="col-md-10">

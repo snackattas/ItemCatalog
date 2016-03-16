@@ -38,3 +38,4 @@ for item in items:
     print "name: " + item.name
     print "user ID: " + str(item.user_id)
     print "category_id: " + str(item.category_id)
+    print "IOC: " + str(item.instant_of_creation)

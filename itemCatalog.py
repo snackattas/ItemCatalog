@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, jsonify, url_for, flash, make_response
 from flask import session as login_session
-from sqlalchemy import create_engine, asc
+from sqlalchemy import create_engine, asc, desc, union, null, literal_column, ForeignKey
 from sqlalchemy.orm import sessionmaker
 from databaseSetup import Base, User, Category, Item
 import random
@@ -69,9 +69,9 @@ def getUserInfo(user_id):
     except:
         return None
 
-# Create anti-forgery state token
 @app.route('/login/')
 def showLogin():
+    # Create anti-forgery state token
     state = ''.join(random.choice(string.ascii_uppercase + string.digits)
                     for x in xrange(32))
     login_session['state'] = state
@@ -277,6 +277,29 @@ def categoryJSON():
     categories = session.query(Category).all()
     return jsonify(categories=[category.serialize for category in categories])
 
+def latestAdditions():
+    categories = session.query(
+    Category.id.label('id'),
+    Category.name.label('name'),
+    null().label('description'),
+    Category.user_id.label('user_id'),
+    Category.instant_of_creation.label('instant_of_creation'),
+    Category.picture.label('picture'),
+    null().label('category_id'),
+    literal_column('"category"').label('type'))
+
+    items = session.query(
+    Item.id.label('id'),
+    Item.name.label('name'),
+    Item.description.label('description'),
+    Item.user_id.label('user_id'),
+    Item.instant_of_creation.label('instant_of_creation'),
+    Item.picture.label('picture'),
+    Item.category_id.label('category_id'),
+    literal_column('"item"').label('type'))
+
+    union = categories.union(items).order_by(desc('instant_of_creation')).limit(20)
+    return union
 
 # Show all restaurants
 @app.route('/category/')
@@ -284,14 +307,24 @@ def showCategory():
     if 'username' not in login_session:
         return redirect(url_for('showPublicCategory'))
     categories = session.query(Category).order_by(asc(Category.name))
-    return render_template('category.html', categories=categories, login_session=login_session, no_categories=isinstance(categories, list))
+    no_categories = False
+    try:
+        content = categories[0]
+    except:
+        no_categories = True
+    return render_template('category.html', categories=categories, login_session=login_session, no_categories=no_categories)
 
 # Public face of Restaurant database
 @app.route('/')
 @app.route('/publicCategory/')
 def showPublicCategory():
     categories = session.query(Category).order_by(asc(Category.name))
-    return render_template('publicCategory.html', categories=categories, no_categories=isinstance(categories, list))
+    no_categories = False
+    try:
+        content = categories[0]
+    except:
+        no_categories = True
+    return render_template('publicCategory.html', categories=categories, no_categories=no_categories, latest_additions=latestAdditions())
 
 @app.route('/publicCategory/<int:category_id>/publicItem/')
 def showPublicItem(category_id):
@@ -401,7 +434,7 @@ def editItem(category_id, item_id):
         flash('Item Successfully Edited')
         return redirect(url_for('showItem', category_id=category_id))
     else:
-        return render_template('editItem.html', category_id=category_id, item_id=item_id, item=editedItem, login_session=login_session)
+        return render_template('editItem.html', category_id=category_id, item_id=item_id, item=edited_item, login_session=login_session)
 
 # Delete a menu item
 @app.route('/category/<int:category_id>/item/<int:item_id>/delete/', methods=['GET', 'POST'])
