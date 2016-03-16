@@ -40,11 +40,6 @@ def createUser(login_session):
     session.commit()
     return getUserID(login_session).id
 
-    session.add(newUser)
-    session.commit()
-    user = session.query(User).filter_by(email = login_session['email']).one()
-    return user.id
-
 def getFacebookUserID(login_session):
     try:
         user = session.query(User).filter_by(email=login_session.get('email'), facebook_id=login_session.get('facebook_id')).one()
