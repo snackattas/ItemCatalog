@@ -12,8 +12,10 @@ import requests
 from contextlib import contextmanager
 from datetime import datetime
 from dateutil import tz
+from flask_moment import Moment
 
 app = Flask(__name__)
+moment = Moment(app)
 APPLICATION_NAME = "Item Catalog Application"
 # Connect to Database and create database session
 engine = create_engine('sqlite:///itemCatalog.db')
@@ -325,12 +327,12 @@ def latestAdditions():
 
         #tz info
         for addition in union_dict:
-            utc_time = addition['instant_of_creation']
-            utc_time = utc_time.replace(tzinfo=tz.tzutc())
-            print utc_time.tzname()
-            local_time = utc_time.astimezone(tz.tzlocal())
-            print local_time.tzname()
-            addition['instant_of_creation'] = local_time.strftime("%I:%M:%S %p, %b %d").lstrip('0')
+            # utc_time = addition['instant_of_creation']
+            # utc_time = utc_time.replace(tzinfo=tz.tzutc())
+            # print utc_time.tzname()
+            # local_time = utc_time.astimezone(tz.tzlocal())
+            # print local_time.tzname()
+            # addition['instant_of_creation'] = local_time.strftime("%I:%M:%S %p, %b %d").lstrip('0')
 
             #"%I:%M:%S %p, %b %d"
             if addition['type'] == 'item':

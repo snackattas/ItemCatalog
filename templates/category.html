@@ -28,15 +28,15 @@
   {% endwith %}
 </div>
 
-<div class="latest-items">
-Latest Items
+<div class="recent-activity">
+Recent Activity
 <ul>
 {% for category_and_item in latest_additions %}
 	{% if category_and_item.type == 'category' %}
-		<li>Category <a href="{{url_for('showItem', category_id=category_and_item.id)}}"><i>{{category_and_item.name}}</i></a> added at {{category_and_item.instant_of_creation}}</li>
+		<li>Category <a href="{{url_for('showItem', category_id=category_and_item.id)}}"><i>{{category_and_item.name}}</i></a> added at {{moment(category_and_item.instant_of_creation).format("h:mm:ssa MMM D")}}</li>
 	{% endif %}
 	{% if category_and_item.type == 'item' %}
-	<li>Item <a href="{{url_for('showItem', category_id = category_and_item.category_id, _anchor=category_and_item.id)}}"><i>{{category_and_item.name}}</i></a> added to Category <a href="{{url_for('showItem', category_id=category_and_item.category_id)}}"><i>{{category_and_item.category_name}}</i></a> at  {{category_and_item.instant_of_creation}}</li>
+	<li>Item <a href="{{url_for('showItem', category_id = category_and_item.category_id, _anchor=category_and_item.id)}}"><i>{{category_and_item.name}}</i></a> added to Category <a href="{{url_for('showItem', category_id=category_and_item.category_id)}}"><i>{{category_and_item.category_name}}</i></a> at  {{moment(category_and_item.instant_of_creation).format("h:mm:ssa MMM D")}}</li>
 	{% endif %}
 {% endfor %}
 </ul>
