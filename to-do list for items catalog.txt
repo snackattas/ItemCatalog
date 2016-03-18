@@ -31,4 +31,19 @@ categorify all files!
 -maybe do it in python
 -flask packages for moving oauth files to another py module
 
-- if you get image attach working, put the URL in the JSON readers 
+- if you get image attach working, put the URL in the JSON readers
+- make latestaddition work in local time, and correct time that it's showing. it's showing the wrong time!
+
+
+images
+https://discussions.udacity.com/t/sqlalchemy-imageattach/159443
+https://discussions.udacity.com/t/images-and-blobs-in-databases/24503
+https://discussions.udacity.com/t/sqlalchemy-imageattach/42244
+
+WTFforms
+https://discussions.udacity.com/t/populate-wtform-textareafield-and-select-value/39232
+
+if all doesnt work
+https://discussions.udacity.com/t/update-image-and-display-instantly/37231
+
+https://pythonhosted.org/Flask-Babel/

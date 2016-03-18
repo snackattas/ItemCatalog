@@ -29,7 +29,7 @@ for category in categories:
     print "ID: " + str(category.id)
     print "name: " + category.name
     print "user ID: " + str(category.user_id)
-    print "picture: " + category.picture
+    print "picture: " + str(category.picture)
     print "IOC: %s" % (category.instant_of_creation)
 print '\n'
 items = session.query(Item).order_by(asc(Item.user_id)).all()

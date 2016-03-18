@@ -24,7 +24,7 @@ class Category(Base):
     user_id = Column(Integer, ForeignKey('user.id'))
     user = relationship(User)
     picture = Column(LargeBinary)
-    instant_of_creation = Column(DateTime, default=datetime.datetime.utcnow)
+    instant_of_creation = Column(DateTime(timezone=True), default=datetime.datetime.utcnow())
 
     @property
     def serialize(self):
@@ -45,7 +45,7 @@ class Item(Base):
     user_id = Column(Integer, ForeignKey('user.id'))
     user = relationship(User)
     picture = Column(LargeBinary)
-    instant_of_creation = Column(DateTime, default=datetime.datetime.utcnow)
+    instant_of_creation = Column(DateTime(timezone=True), default=datetime.datetime.utcnow())
 
     @property
     def serialize(self):
