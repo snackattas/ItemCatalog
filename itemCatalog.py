@@ -13,6 +13,7 @@ from contextlib import contextmanager
 from datetime import datetime
 from dateutil import tz
 from flask_moment import Moment
+import sqlalchemy.exc
 
 app = Flask(__name__)
 moment = Moment(app)
@@ -29,9 +30,11 @@ def get_session():
         yield session
     except:
         session.rollback()
-        raise
-    else:
+        redirect(url_for('pageNotFound', error=404))
+    try:
         session.commit()
+    except:
+        redirect(url_for('pageNotFound', error=404))
 
 
 def createUser(login_session):
@@ -502,6 +505,14 @@ def deleteItem(category_id, item_id):
             return redirect(url_for('showItem', category_id=category_id))
         else:
             return render_template('deleteItem.html', item=item_to_delete, login_session=login_session)
+
+@app.route('/error/')
+@app.errorhandler(304)
+@app.errorhandler(404)
+@app.errorhandler(500)
+def pageNotFound(error):
+    print 'here'+str(error)
+    return render_template('pageNotFound.html', error=error), 404
 
 
 if __name__ == '__main__':

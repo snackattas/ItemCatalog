@@ -45,5 +45,3 @@ https://discussions.udacity.com/t/populate-wtform-textareafield-and-select-value
 
 if all doesnt work
 https://discussions.udacity.com/t/update-image-and-display-instantly/37231
-
-https://pythonhosted.org/Flask-Babel/
