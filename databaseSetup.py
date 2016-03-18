@@ -32,7 +32,6 @@ class Category(Base):
        return {
            'name'                : self.name,
            'id'                  : self.id,
-           'instant_of_creation' : self.instant_of_creation
        }
 
 class Item(Base):
@@ -55,7 +54,6 @@ class Item(Base):
            'name'                : self.name,
            'description'         : self.description,
            'id'                  : self.id,
-           'instant_of_creation' : self.instant_of_creation
        }
 
 

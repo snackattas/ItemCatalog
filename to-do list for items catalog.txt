@@ -25,3 +25,10 @@ categorify all files!
 - move the category edit name to the category screen. Also create a delete category function/link, put it in the same place
 -block against null entries. Maybe do it in javascript!
 -maybe some kind of style switch on the category page to indicate that I've created a category?
+- delete old google/facebook restaurant app and create new category oauth stuff.  Wait I just renamed it!??!
+- for images just have blob url
+-flask wtf features for https://flask-wtf.readthedocs.org/en/latest/
+-maybe do it in python
+-flask packages for moving oauth files to another py module
+
+- if you get image attach working, put the URL in the JSON readers 

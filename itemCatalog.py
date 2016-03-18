@@ -9,6 +9,7 @@ from oauth2client.client import flow_from_clientsecrets, FlowExchangeError
 import httplib2
 import json
 import requests
+from contextlib import contextmanager
 
 app = Flask(__name__)
 APPLICATION_NAME = "Item Catalog Application"
@@ -16,7 +17,17 @@ APPLICATION_NAME = "Item Catalog Application"
 engine = create_engine('sqlite:///itemCatalog.db')
 Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
-session = DBSession()
+
+@contextmanager
+def get_session():
+    session = DBSession()
+    try:
+        yield session
+    except:
+        session.rollback()
+        raise
+    else:
+        session.commit()
 
 
 def createUser(login_session):
@@ -260,8 +271,7 @@ def disconnect():
 ###Does it matter what I call the thin in the return statement?
 @app.route('/category/<int:category_id>/item/JSON/')
 def categoryItemJSON(category_id):
-    category = session.query(Category).filter_by(id=category_id).one()
-    items = session.query(Items).filter_by(
+    items = session.query(Item).filter_by(
         category_id=category_id).all()
     return jsonify(items=[item.serialize for item in items])
 
@@ -286,6 +296,7 @@ def latestAdditions():
     Category.instant_of_creation.label('instant_of_creation'),
     Category.picture.label('picture'),
     null().label('category_id'),
+    null().label('category_name'),
     literal_column('"category"').label('type'))
 
     items = session.query(
@@ -296,10 +307,17 @@ def latestAdditions():
     Item.instant_of_creation.label('instant_of_creation'),
     Item.picture.label('picture'),
     Item.category_id.label('category_id'),
+    null().label('category_name'),
     literal_column('"item"').label('type'))
 
-    union = categories.union(items).order_by(desc('instant_of_creation')).limit(20)
-    return union
+    union = categories.union(items).order_by(desc('instant_of_creation')).limit(10)
+    union_dict = [u.__dict__ for u in union]
+    for addition in union_dict:
+        addition['instant_of_creation'] = addition['instant_of_creation'].strftime("%I:%M:%S %p, %b %w").lstrip('0')
+        if addition['type'] == 'item':
+            category_of_item = session.query(Category).filter_by(id=addition['category_id']).one()
+            addition['category_name'] = category_of_item.name
+    return union_dict
 
 # Show all restaurants
 @app.route('/category/')
@@ -312,7 +330,7 @@ def showCategory():
         content = categories[0]
     except:
         no_categories = True
-    return render_template('category.html', categories=categories, login_session=login_session, no_categories=no_categories)
+    return render_template('category.html', categories=categories, login_session=login_session, no_categories=no_categories, latest_additions=latestAdditions())
 
 # Public face of Restaurant database
 @app.route('/')
@@ -390,7 +408,7 @@ def deleteCategory(category_id):
 @app.route('/category/<int:category_id>/item/')
 def showItem(category_id):
     if 'username' not in login_session:
-        return redirect(url_for('showPublicCategory'))
+        return redirect(url_for('showPublicItem', category_id=category_id))
     category = session.query(Category).filter_by(id=category_id).one()
     items = session.query(Item).filter_by(category_id=category_id).all()
     creator = getUserInfo(category.user_id)
