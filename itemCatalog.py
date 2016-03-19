@@ -10,8 +10,6 @@ import httplib2
 import json
 import requests
 from contextlib import contextmanager
-from datetime import datetime
-from dateutil import tz
 from flask_moment import Moment
 import sqlalchemy.exc
 
@@ -518,4 +516,4 @@ def pageNotFound(error):
 if __name__ == '__main__':
     app.secret_key = 'super_secret_key'
     app.debug = True
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=8000)

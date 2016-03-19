@@ -10,3 +10,5 @@ pip install requests
 pip install httplib2
 pip install SQLAlchemy-ImageAttach
 pip install Flask-Moment
+pip install Flask-SQLAlchemy
+pip install Flask-WTF
