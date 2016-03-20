@@ -1,8 +1,6 @@
 from flask import Flask, render_template, request, redirect, jsonify, url_for, flash, make_response
 from flask import session as login_session
-from sqlalchemy import create_engine, asc, desc, union, null, literal_column, ForeignKey
-from sqlalchemy.orm import sessionmaker
-from databaseSetup import Base, User, Category, Item
+from databaseSetup import User, Category, Item
 import random
 import string
 from oauth2client.client import flow_from_clientsecrets, FlowExchangeError
@@ -11,27 +9,31 @@ import json
 import requests
 from contextlib import contextmanager
 from flask_moment import Moment
-import sqlalchemy.exc
+from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 moment = Moment(app)
 APPLICATION_NAME = "Item Catalog Application"
 # Connect to Database and create database session
-engine = create_engine('sqlite:///itemCatalog.db')
-Base.metadata.bind = engine
-DBSession = sessionmaker(bind=engine)
-
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///itemCatalog.db'
+app.config[' SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+app.debug=True
+db = SQLAlchemy(app)
 @contextmanager
 def get_session():
-    session = DBSession()
+    session = db.session
     try:
+        print 'in session1'
         yield session
     except:
+        print 'in session2'
         session.rollback()
         redirect(url_for('pageNotFound', error=404))
     try:
+        print 'insession3'
         session.commit()
     except:
+        print 'insession4'
         redirect(url_for('pageNotFound', error=404))
 
 
@@ -39,7 +41,7 @@ def createUser(login_session):
     user_id = getUserID(login_session)
     if user_id:
         with get_session() as session:
-            user = session.query(User).filter_by(id=user_id).one()
+            user = User.query.filter_by(id=user_id).one()
             if login_session.get('facebook_id'):
                 ### might be dot syntax for adding here
                 user.facebook_id = login_session['facebook_id']
@@ -58,7 +60,7 @@ def createUser(login_session):
 def getFacebookUserID(login_session):
     try:
         with get_session() as session:
-            user = session.query(User).filter_by(email=login_session.get('email'), facebook_id=login_session.get('facebook_id')).one()
+            user = User.query.filter_by(email=login_session.get('email'), facebook_id=login_session.get('facebook_id')).one()
         return user.id
     except:
         return None
@@ -66,7 +68,7 @@ def getFacebookUserID(login_session):
 def getGoogleUserID(login_session):
     try:
         with get_session() as session:
-            user = session.query(User).filter_by(email=login_session.get('email'), gplus_id=login_session.get('gplus_id')).one()
+            user = User.query.filter_by(email=login_session.get('email'), gplus_id=login_session.get('gplus_id')).one()
         return user.id
     except:
         return None
@@ -75,7 +77,7 @@ def getUserID(login_session):
     try:
         ### is it a good idea to pass along a query object through functions?
         with get_session() as session:
-            user = session.query(User).filter_by(email=login_session.get('email')).one()
+            user = User.query.filter_by(email=login_session.get('email')).one()
         return user.id
     except:
         return None
@@ -83,7 +85,7 @@ def getUserID(login_session):
 def getUserInfo(user_id):
     try:
         with get_session() as session:
-            user = session.query(User).filter_by(id=user_id).one()
+            user = User.query.filter_by(id=user_id).one()
         user_info = user
         return user_info
     except:
@@ -281,7 +283,7 @@ def disconnect():
 @app.route('/category/<int:category_id>/item/JSON/')
 def categoryItemJSON(category_id):
     with get_session() as session:
-        items = session.query(Item).filter_by(
+        items = Item.query.filter_by(
         category_id=category_id).all()
         return jsonify(items=[item.serialize for item in items])
 
@@ -289,30 +291,30 @@ def categoryItemJSON(category_id):
 @app.route('/category/<int:category_id>/item/<int:item_id>/JSON/')
 def itemJSON(category_id, item_id):
     with get_session() as session:
-        item = session.query(Item).filter_by(id=item_id).one()
+        item = Item.query.filter_by(id=item_id).one()
         return jsonify(item=item.serialize)
 
 
 @app.route('/category/JSON/')
 def categoryJSON():
     with get_session() as session:
-        categories = session.query(Category).all()
+        categories = Category.query.all()
         return jsonify(categories=[category.serialize for category in categories])
 
 def latestAdditions():
     with get_session() as session:
-        categories = session.query(
+        categories = Category.query(
         Category.id.label('id'),
         Category.name.label('name'),
-        null().label('description'),
+        db.null().label('description'),
         Category.user_id.label('user_id'),
         Category.instant_of_creation.label('instant_of_creation'),
         Category.picture.label('picture'),
-        null().label('category_id'),
-        null().label('category_name'),
-        literal_column('"category"').label('type'))
+        db.null().label('category_id'),
+        db.null().label('category_name'),
+        db.literal_column('"category"').label('type'))
 
-        items = session.query(
+        items = Item.query(
         Item.id.label('id'),
         Item.name.label('name'),
         Item.description.label('description'),
@@ -320,24 +322,16 @@ def latestAdditions():
         Item.instant_of_creation.label('instant_of_creation'),
         Item.picture.label('picture'),
         Item.category_id.label('category_id'),
-        null().label('category_name'),
-        literal_column('"item"').label('type'))
-
-        union = categories.union(items).order_by(desc('instant_of_creation')).limit(10)
+        db.null().label('category_name'),
+        db.literal_column('"item"').label('type'))
+        ### do i need a db.union here
+        union = categories.union(items).order_by(db.desc('instant_of_creation')).limit(10)
         union_dict = [u.__dict__ for u in union]
 
         #tz info
         for addition in union_dict:
-            # utc_time = addition['instant_of_creation']
-            # utc_time = utc_time.replace(tzinfo=tz.tzutc())
-            # print utc_time.tzname()
-            # local_time = utc_time.astimezone(tz.tzlocal())
-            # print local_time.tzname()
-            # addition['instant_of_creation'] = local_time.strftime("%I:%M:%S %p, %b %d").lstrip('0')
-
-            #"%I:%M:%S %p, %b %d"
             if addition['type'] == 'item':
-                category_of_item = session.query(Category).filter_by(id=addition['category_id']).one()
+                category_of_item = Category.query.filter_by(id=addition['category_id']).one()
                 addition['category_name'] = category_of_item.name
         return union_dict
 
@@ -347,7 +341,7 @@ def showCategory():
     if 'username' not in login_session:
         return redirect(url_for('showPublicCategory'))
     with get_session() as session:
-        categories = session.query(Category).order_by(asc(Category.name))
+        categories = Category.query.order_by(db.asc(Category.name))
         no_categories = False
         try:
             content = categories[0]
@@ -359,9 +353,11 @@ def showCategory():
 @app.route('/')
 @app.route('/publicCategory/')
 def showPublicCategory():
+    print 'here1'
     with get_session() as session:
-        categories = session.query(Category).order_by(asc(Category.name))
+        categories = Category.query.order_by(asc(Category.name))
         no_categories = False
+        print 'here2'
         try:
             content = categories[0]
         except:
@@ -371,10 +367,10 @@ def showPublicCategory():
 @app.route('/publicCategory/<int:category_id>/publicItem/')
 def showPublicItem(category_id):
     with get_session() as session:
-        category = session.query(Category).filter_by(id=category_id).one()
-        items = session.query(Item).filter_by(
+        category = Category.query.filter_by(id=category_id).one()
+        items = Item.query.filter_by(
             category_id=category.id).all()
-        creator = session.query(User).filter_by(id=category.user_id).one()
+        creator = User.query.filter_by(id=category.user_id).one()
         return render_template('publicItem.html', items=items, category=category, creator=creator)
 
 @app.route('/category/new/', methods=['GET', 'POST'])
@@ -395,13 +391,12 @@ def editCategory(category_id):
     if 'username' not in login_session:
         return redirect(url_for('showPublicCategory'))
     with get_session() as session:
-        category = session.query(Category).filter_by(id=category_id).one()
+        category = Category.query.filter_by(id=category_id).one()
         user_id = category.user_id
         ### I have a feeling this will need to be reworked
         if user_id != login_session['user_id']:
             return redirect(url_for('showCategory'))
-        editedCategory = session.query(
-            Category).filter_by(id=category_id).one()
+        editedCategory = Category.query.filter_by(id=category_id).one()
         if request.method == 'POST':
             if request.form['name']:
                 editedCategory.name = request.form['name']
@@ -416,15 +411,13 @@ def deleteCategory(category_id):
     if 'username' not in login_session:
         return redirect(url_for('showPublicCategory'))
     with get_session() as session:
-        category_to_delete = session.query(
-            Category).filter_by(id=category_id).one()
+        category_to_delete = Category.query.filter_by(id=category_id).one()
         user_id = category_to_delete.user_id
         if user_id != login_session['user_id']:
             return redirect(url_for('showCategory'))
         if request.method == 'POST':
             session.delete(category_to_delete)
             flash('%s Successfully Deleted' % category_to_delete.name)
-            session.commit()
             return redirect(url_for('showCategory', category_id=category_id))
         else:
             return render_template('deleteCategory.html', category=category_to_delete, login_session=login_session)
@@ -436,9 +429,9 @@ def showItem(category_id):
     if 'username' not in login_session:
         return redirect(url_for('showPublicItem', category_id=category_id))
     with get_session() as session:
-        category = session.query(Category).filter_by(id=category_id).one()
-        items = session.query(Item).filter_by(category_id=category_id).all()
-        creator = session.query(User).filter_by(id=category.user_id).one()
+        category = Category.query.filter_by(id=category_id).one()
+        items = Item.query.filter_by(category_id=category_id).all()
+        creator = User.query.filter_by(id=category.user_id).one()
         return render_template('item.html', items=items, category=category, login_session=login_session, creator=creator, user_id=login_session['user_id'])
 
 # Create a new item
@@ -447,7 +440,7 @@ def newItem(category_id):
     if 'username' not in login_session:
         return redirect(url_for('showPublicCategory'))
     with get_session() as session:
-        category = session.query(Category).filter_by(id=category_id).one()
+        category = Category.query.filter_by(id=category_id).one()
         user_id = category.user_id
         if user_id != login_session['user_id']:
             return redirect(url_for('showCategory'))
@@ -455,7 +448,6 @@ def newItem(category_id):
             newItem = Item(name=request.form['name'], description=request.form[
                                'description'], category_id=category_id)
             session.add(newItem)
-            session.commit()
             flash('New Item %s Successfully Created' % (newItem.name))
             return redirect(url_for('showItem', category_id=category_id))
         else:
@@ -467,7 +459,7 @@ def editItem(category_id, item_id):
     if 'username' not in login_session:
         return redirect(url_for('showPublicCategory'))
     with get_session() as session:
-        edited_item = session.query(Item).filter_by(id=item_id, category_id=category_id).one()
+        edited_item = Item.query.filter_by(id=item_id, category_id=category_id).one()
         user_id = edited_item.user_id
         if user_id != login_session['user_id']:
             return redirect(url_for('showCategory'))
@@ -477,7 +469,6 @@ def editItem(category_id, item_id):
             if request.form['description']:
                 edited_item.description = request.form['description']
             session.add(edited_item)
-            session.commit()
             flash('Item Successfully Edited')
             return redirect(url_for('showItem', category_id=category_id))
         else:
@@ -489,7 +480,7 @@ def deleteItem(category_id, item_id):
     if 'username' not in login_session:
         return redirect(url_for('showPublicCategory'))
     with get_session() as session:
-        item_to_delete = session.query(Item).filter_by(id=item_id, category_id=category_id).one()
+        item_to_delete = Item.query.filter_by(id=item_id, category_id=category_id).one()
         user_id = item_to_delete.user_id
         print 'user_id'+str(user_id)
         print login_session['user_id']
@@ -498,7 +489,6 @@ def deleteItem(category_id, item_id):
             return redirect(url_for('showCategory'))
         if request.method == 'POST':
             session.delete(item_to_delete)
-            session.commit()
             flash('Item Successfully Deleted')
             return redirect(url_for('showItem', category_id=category_id))
         else:
@@ -510,10 +500,10 @@ def deleteItem(category_id, item_id):
 @app.errorhandler(500)
 def pageNotFound(error):
     print 'here'+str(error)
-    return render_template('pageNotFound.html', error=error), 404
+    return make_response(render_template('pageNotFound.html', error=error), 404)
 
 
 if __name__ == '__main__':
-    app.secret_key = 'super_secret_key'
+    app.config['SECRET_KEY'] = 'super_secret_key'
     app.debug = True
     app.run(host='0.0.0.0', port=8000)
