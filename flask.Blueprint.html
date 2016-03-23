@@ -1,0 +1,246 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: class Blueprint</title>
+<meta charset="utf-8">
+</head><body bgcolor="#f0f0f8">
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><strong>flask.Blueprint</strong> = <a name="flask.Blueprint">class Blueprint</a>(<a href="flask.helpers.html#_PackageBoundObject">flask.helpers._PackageBoundObject</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>Represents&nbsp;a&nbsp;blueprint.&nbsp;&nbsp;A&nbsp;blueprint&nbsp;is&nbsp;an&nbsp;object&nbsp;that&nbsp;records<br>
+functions&nbsp;that&nbsp;will&nbsp;be&nbsp;called&nbsp;with&nbsp;the<br>
+:class:`~flask.blueprint.BlueprintSetupState`&nbsp;later&nbsp;to&nbsp;register&nbsp;functions<br>
+or&nbsp;other&nbsp;things&nbsp;on&nbsp;the&nbsp;main&nbsp;application.&nbsp;&nbsp;See&nbsp;:ref:`blueprints`&nbsp;for&nbsp;more<br>
+information.<br>
+&nbsp;<br>
+..&nbsp;versionadded::&nbsp;0.7<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="flask.blueprints.html#Blueprint">Blueprint</a></dd>
+<dd><a href="flask.helpers.html#_PackageBoundObject">flask.helpers._PackageBoundObject</a></dd>
+<dd><a href="__builtin__.html#object">__builtin__.object</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="Blueprint-__init__"><strong>__init__</strong></a>(self, name, import_name, static_folder<font color="#909090">=None</font>, static_url_path<font color="#909090">=None</font>, template_folder<font color="#909090">=None</font>, url_prefix<font color="#909090">=None</font>, subdomain<font color="#909090">=None</font>, url_defaults<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="Blueprint-add_app_template_filter"><strong>add_app_template_filter</strong></a>(self, f, name<font color="#909090">=None</font>)</dt><dd><tt>Register&nbsp;a&nbsp;custom&nbsp;template&nbsp;filter,&nbsp;available&nbsp;application&nbsp;wide.&nbsp;&nbsp;Like<br>
+:meth:`Flask.add_template_filter`&nbsp;but&nbsp;for&nbsp;a&nbsp;blueprint.&nbsp;&nbsp;Works&nbsp;exactly<br>
+like&nbsp;the&nbsp;:meth:`app_template_filter`&nbsp;decorator.<br>
+&nbsp;<br>
+:param&nbsp;name:&nbsp;the&nbsp;optional&nbsp;name&nbsp;of&nbsp;the&nbsp;filter,&nbsp;otherwise&nbsp;the<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;function&nbsp;name&nbsp;will&nbsp;be&nbsp;used.</tt></dd></dl>
+
+<dl><dt><a name="Blueprint-add_app_template_global"><strong>add_app_template_global</strong></a>(self, f, name<font color="#909090">=None</font>)</dt><dd><tt>Register&nbsp;a&nbsp;custom&nbsp;template&nbsp;global,&nbsp;available&nbsp;application&nbsp;wide.&nbsp;&nbsp;Like<br>
+:meth:`Flask.add_template_global`&nbsp;but&nbsp;for&nbsp;a&nbsp;blueprint.&nbsp;&nbsp;Works&nbsp;exactly<br>
+like&nbsp;the&nbsp;:meth:`app_template_global`&nbsp;decorator.<br>
+&nbsp;<br>
+..&nbsp;versionadded::&nbsp;0.10<br>
+&nbsp;<br>
+:param&nbsp;name:&nbsp;the&nbsp;optional&nbsp;name&nbsp;of&nbsp;the&nbsp;global,&nbsp;otherwise&nbsp;the<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;function&nbsp;name&nbsp;will&nbsp;be&nbsp;used.</tt></dd></dl>
+
+<dl><dt><a name="Blueprint-add_app_template_test"><strong>add_app_template_test</strong></a>(self, f, name<font color="#909090">=None</font>)</dt><dd><tt>Register&nbsp;a&nbsp;custom&nbsp;template&nbsp;test,&nbsp;available&nbsp;application&nbsp;wide.&nbsp;&nbsp;Like<br>
+:meth:`Flask.add_template_test`&nbsp;but&nbsp;for&nbsp;a&nbsp;blueprint.&nbsp;&nbsp;Works&nbsp;exactly<br>
+like&nbsp;the&nbsp;:meth:`app_template_test`&nbsp;decorator.<br>
+&nbsp;<br>
+..&nbsp;versionadded::&nbsp;0.10<br>
+&nbsp;<br>
+:param&nbsp;name:&nbsp;the&nbsp;optional&nbsp;name&nbsp;of&nbsp;the&nbsp;test,&nbsp;otherwise&nbsp;the<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;function&nbsp;name&nbsp;will&nbsp;be&nbsp;used.</tt></dd></dl>
+
+<dl><dt><a name="Blueprint-add_url_rule"><strong>add_url_rule</strong></a>(self, rule, endpoint<font color="#909090">=None</font>, view_func<font color="#909090">=None</font>, **options)</dt><dd><tt>Like&nbsp;:meth:`Flask.add_url_rule`&nbsp;but&nbsp;for&nbsp;a&nbsp;blueprint.&nbsp;&nbsp;The&nbsp;endpoint&nbsp;for<br>
+the&nbsp;:func:`url_for`&nbsp;function&nbsp;is&nbsp;prefixed&nbsp;with&nbsp;the&nbsp;name&nbsp;of&nbsp;the&nbsp;blueprint.</tt></dd></dl>
+
+<dl><dt><a name="Blueprint-after_app_request"><strong>after_app_request</strong></a>(self, f)</dt><dd><tt>Like&nbsp;:meth:`Flask.after_request`&nbsp;but&nbsp;for&nbsp;a&nbsp;blueprint.&nbsp;&nbsp;Such&nbsp;a&nbsp;function<br>
+is&nbsp;executed&nbsp;after&nbsp;each&nbsp;request,&nbsp;even&nbsp;if&nbsp;outside&nbsp;of&nbsp;the&nbsp;blueprint.</tt></dd></dl>
+
+<dl><dt><a name="Blueprint-after_request"><strong>after_request</strong></a>(self, f)</dt><dd><tt>Like&nbsp;:meth:`Flask.after_request`&nbsp;but&nbsp;for&nbsp;a&nbsp;blueprint.&nbsp;&nbsp;This&nbsp;function<br>
+is&nbsp;only&nbsp;executed&nbsp;after&nbsp;each&nbsp;request&nbsp;that&nbsp;is&nbsp;handled&nbsp;by&nbsp;a&nbsp;function&nbsp;of<br>
+that&nbsp;blueprint.</tt></dd></dl>
+
+<dl><dt><a name="Blueprint-app_context_processor"><strong>app_context_processor</strong></a>(self, f)</dt><dd><tt>Like&nbsp;:meth:`Flask.context_processor`&nbsp;but&nbsp;for&nbsp;a&nbsp;blueprint.&nbsp;&nbsp;Such&nbsp;a<br>
+function&nbsp;is&nbsp;executed&nbsp;each&nbsp;request,&nbsp;even&nbsp;if&nbsp;outside&nbsp;of&nbsp;the&nbsp;blueprint.</tt></dd></dl>
+
+<dl><dt><a name="Blueprint-app_errorhandler"><strong>app_errorhandler</strong></a>(self, code)</dt><dd><tt>Like&nbsp;:meth:`Flask.errorhandler`&nbsp;but&nbsp;for&nbsp;a&nbsp;blueprint.&nbsp;&nbsp;This<br>
+handler&nbsp;is&nbsp;used&nbsp;for&nbsp;all&nbsp;requests,&nbsp;even&nbsp;if&nbsp;outside&nbsp;of&nbsp;the&nbsp;blueprint.</tt></dd></dl>
+
+<dl><dt><a name="Blueprint-app_template_filter"><strong>app_template_filter</strong></a>(self, name<font color="#909090">=None</font>)</dt><dd><tt>Register&nbsp;a&nbsp;custom&nbsp;template&nbsp;filter,&nbsp;available&nbsp;application&nbsp;wide.&nbsp;&nbsp;Like<br>
+:meth:`Flask.template_filter`&nbsp;but&nbsp;for&nbsp;a&nbsp;blueprint.<br>
+&nbsp;<br>
+:param&nbsp;name:&nbsp;the&nbsp;optional&nbsp;name&nbsp;of&nbsp;the&nbsp;filter,&nbsp;otherwise&nbsp;the<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;function&nbsp;name&nbsp;will&nbsp;be&nbsp;used.</tt></dd></dl>
+
+<dl><dt><a name="Blueprint-app_template_global"><strong>app_template_global</strong></a>(self, name<font color="#909090">=None</font>)</dt><dd><tt>Register&nbsp;a&nbsp;custom&nbsp;template&nbsp;global,&nbsp;available&nbsp;application&nbsp;wide.&nbsp;&nbsp;Like<br>
+:meth:`Flask.template_global`&nbsp;but&nbsp;for&nbsp;a&nbsp;blueprint.<br>
+&nbsp;<br>
+..&nbsp;versionadded::&nbsp;0.10<br>
+&nbsp;<br>
+:param&nbsp;name:&nbsp;the&nbsp;optional&nbsp;name&nbsp;of&nbsp;the&nbsp;global,&nbsp;otherwise&nbsp;the<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;function&nbsp;name&nbsp;will&nbsp;be&nbsp;used.</tt></dd></dl>
+
+<dl><dt><a name="Blueprint-app_template_test"><strong>app_template_test</strong></a>(self, name<font color="#909090">=None</font>)</dt><dd><tt>Register&nbsp;a&nbsp;custom&nbsp;template&nbsp;test,&nbsp;available&nbsp;application&nbsp;wide.&nbsp;&nbsp;Like<br>
+:meth:`Flask.template_test`&nbsp;but&nbsp;for&nbsp;a&nbsp;blueprint.<br>
+&nbsp;<br>
+..&nbsp;versionadded::&nbsp;0.10<br>
+&nbsp;<br>
+:param&nbsp;name:&nbsp;the&nbsp;optional&nbsp;name&nbsp;of&nbsp;the&nbsp;test,&nbsp;otherwise&nbsp;the<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;function&nbsp;name&nbsp;will&nbsp;be&nbsp;used.</tt></dd></dl>
+
+<dl><dt><a name="Blueprint-app_url_defaults"><strong>app_url_defaults</strong></a>(self, f)</dt><dd><tt>Same&nbsp;as&nbsp;:meth:`url_defaults`&nbsp;but&nbsp;application&nbsp;wide.</tt></dd></dl>
+
+<dl><dt><a name="Blueprint-app_url_value_preprocessor"><strong>app_url_value_preprocessor</strong></a>(self, f)</dt><dd><tt>Same&nbsp;as&nbsp;:meth:`url_value_preprocessor`&nbsp;but&nbsp;application&nbsp;wide.</tt></dd></dl>
+
+<dl><dt><a name="Blueprint-before_app_first_request"><strong>before_app_first_request</strong></a>(self, f)</dt><dd><tt>Like&nbsp;:meth:`Flask.before_first_request`.&nbsp;&nbsp;Such&nbsp;a&nbsp;function&nbsp;is<br>
+executed&nbsp;before&nbsp;the&nbsp;first&nbsp;request&nbsp;to&nbsp;the&nbsp;application.</tt></dd></dl>
+
+<dl><dt><a name="Blueprint-before_app_request"><strong>before_app_request</strong></a>(self, f)</dt><dd><tt>Like&nbsp;:meth:`Flask.before_request`.&nbsp;&nbsp;Such&nbsp;a&nbsp;function&nbsp;is&nbsp;executed<br>
+before&nbsp;each&nbsp;request,&nbsp;even&nbsp;if&nbsp;outside&nbsp;of&nbsp;a&nbsp;blueprint.</tt></dd></dl>
+
+<dl><dt><a name="Blueprint-before_request"><strong>before_request</strong></a>(self, f)</dt><dd><tt>Like&nbsp;:meth:`Flask.before_request`&nbsp;but&nbsp;for&nbsp;a&nbsp;blueprint.&nbsp;&nbsp;This&nbsp;function<br>
+is&nbsp;only&nbsp;executed&nbsp;before&nbsp;each&nbsp;request&nbsp;that&nbsp;is&nbsp;handled&nbsp;by&nbsp;a&nbsp;function&nbsp;of<br>
+that&nbsp;blueprint.</tt></dd></dl>
+
+<dl><dt><a name="Blueprint-context_processor"><strong>context_processor</strong></a>(self, f)</dt><dd><tt>Like&nbsp;:meth:`Flask.context_processor`&nbsp;but&nbsp;for&nbsp;a&nbsp;blueprint.&nbsp;&nbsp;This<br>
+function&nbsp;is&nbsp;only&nbsp;executed&nbsp;for&nbsp;requests&nbsp;handled&nbsp;by&nbsp;a&nbsp;blueprint.</tt></dd></dl>
+
+<dl><dt><a name="Blueprint-endpoint"><strong>endpoint</strong></a>(self, endpoint)</dt><dd><tt>Like&nbsp;:meth:`Flask.endpoint`&nbsp;but&nbsp;for&nbsp;a&nbsp;blueprint.&nbsp;&nbsp;This&nbsp;does&nbsp;not<br>
+prefix&nbsp;the&nbsp;endpoint&nbsp;with&nbsp;the&nbsp;blueprint&nbsp;name,&nbsp;this&nbsp;has&nbsp;to&nbsp;be&nbsp;done<br>
+explicitly&nbsp;by&nbsp;the&nbsp;user&nbsp;of&nbsp;this&nbsp;method.&nbsp;&nbsp;If&nbsp;the&nbsp;endpoint&nbsp;is&nbsp;prefixed<br>
+with&nbsp;a&nbsp;`.`&nbsp;it&nbsp;will&nbsp;be&nbsp;registered&nbsp;to&nbsp;the&nbsp;current&nbsp;blueprint,&nbsp;otherwise<br>
+it's&nbsp;an&nbsp;application&nbsp;independent&nbsp;endpoint.</tt></dd></dl>
+
+<dl><dt><a name="Blueprint-errorhandler"><strong>errorhandler</strong></a>(self, code_or_exception)</dt><dd><tt>Registers&nbsp;an&nbsp;error&nbsp;handler&nbsp;that&nbsp;becomes&nbsp;active&nbsp;for&nbsp;this&nbsp;blueprint<br>
+only.&nbsp;&nbsp;Please&nbsp;be&nbsp;aware&nbsp;that&nbsp;routing&nbsp;does&nbsp;not&nbsp;happen&nbsp;local&nbsp;to&nbsp;a<br>
+blueprint&nbsp;so&nbsp;an&nbsp;error&nbsp;handler&nbsp;for&nbsp;404&nbsp;usually&nbsp;is&nbsp;not&nbsp;handled&nbsp;by<br>
+a&nbsp;blueprint&nbsp;unless&nbsp;it&nbsp;is&nbsp;caused&nbsp;inside&nbsp;a&nbsp;view&nbsp;function.&nbsp;&nbsp;Another<br>
+special&nbsp;case&nbsp;is&nbsp;the&nbsp;500&nbsp;internal&nbsp;server&nbsp;error&nbsp;which&nbsp;is&nbsp;always&nbsp;looked<br>
+up&nbsp;from&nbsp;the&nbsp;application.<br>
+&nbsp;<br>
+Otherwise&nbsp;works&nbsp;as&nbsp;the&nbsp;:meth:`~flask.Flask.errorhandler`&nbsp;decorator<br>
+of&nbsp;the&nbsp;:class:`~flask.Flask`&nbsp;object.</tt></dd></dl>
+
+<dl><dt><a name="Blueprint-make_setup_state"><strong>make_setup_state</strong></a>(self, app, options, first_registration<font color="#909090">=False</font>)</dt><dd><tt>Creates&nbsp;an&nbsp;instance&nbsp;of&nbsp;:meth:`~flask.blueprints.BlueprintSetupState`<br>
+object&nbsp;that&nbsp;is&nbsp;later&nbsp;passed&nbsp;to&nbsp;the&nbsp;register&nbsp;callback&nbsp;functions.<br>
+Subclasses&nbsp;can&nbsp;override&nbsp;this&nbsp;to&nbsp;return&nbsp;a&nbsp;subclass&nbsp;of&nbsp;the&nbsp;setup&nbsp;state.</tt></dd></dl>
+
+<dl><dt><a name="Blueprint-record"><strong>record</strong></a>(self, func)</dt><dd><tt>Registers&nbsp;a&nbsp;function&nbsp;that&nbsp;is&nbsp;called&nbsp;when&nbsp;the&nbsp;blueprint&nbsp;is<br>
+registered&nbsp;on&nbsp;the&nbsp;application.&nbsp;&nbsp;This&nbsp;function&nbsp;is&nbsp;called&nbsp;with&nbsp;the<br>
+state&nbsp;as&nbsp;argument&nbsp;as&nbsp;returned&nbsp;by&nbsp;the&nbsp;:meth:`make_setup_state`<br>
+method.</tt></dd></dl>
+
+<dl><dt><a name="Blueprint-record_once"><strong>record_once</strong></a>(self, func)</dt><dd><tt>Works&nbsp;like&nbsp;:meth:`record`&nbsp;but&nbsp;wraps&nbsp;the&nbsp;function&nbsp;in&nbsp;another<br>
+function&nbsp;that&nbsp;will&nbsp;ensure&nbsp;the&nbsp;function&nbsp;is&nbsp;only&nbsp;called&nbsp;once.&nbsp;&nbsp;If&nbsp;the<br>
+blueprint&nbsp;is&nbsp;registered&nbsp;a&nbsp;second&nbsp;time&nbsp;on&nbsp;the&nbsp;application,&nbsp;the<br>
+function&nbsp;passed&nbsp;is&nbsp;not&nbsp;called.</tt></dd></dl>
+
+<dl><dt><a name="Blueprint-register"><strong>register</strong></a>(self, app, options, first_registration<font color="#909090">=False</font>)</dt><dd><tt>Called&nbsp;by&nbsp;:meth:`Flask.register_blueprint`&nbsp;to&nbsp;register&nbsp;a&nbsp;blueprint<br>
+on&nbsp;the&nbsp;application.&nbsp;&nbsp;This&nbsp;can&nbsp;be&nbsp;overridden&nbsp;to&nbsp;customize&nbsp;the&nbsp;register<br>
+behavior.&nbsp;&nbsp;Keyword&nbsp;arguments&nbsp;from<br>
+:func:`~flask.Flask.register_blueprint`&nbsp;are&nbsp;directly&nbsp;forwarded&nbsp;to&nbsp;this<br>
+method&nbsp;in&nbsp;the&nbsp;`options`&nbsp;dictionary.</tt></dd></dl>
+
+<dl><dt><a name="Blueprint-route"><strong>route</strong></a>(self, rule, **options)</dt><dd><tt>Like&nbsp;:meth:`Flask.route`&nbsp;but&nbsp;for&nbsp;a&nbsp;blueprint.&nbsp;&nbsp;The&nbsp;endpoint&nbsp;for&nbsp;the<br>
+:func:`url_for`&nbsp;function&nbsp;is&nbsp;prefixed&nbsp;with&nbsp;the&nbsp;name&nbsp;of&nbsp;the&nbsp;blueprint.</tt></dd></dl>
+
+<dl><dt><a name="Blueprint-teardown_app_request"><strong>teardown_app_request</strong></a>(self, f)</dt><dd><tt>Like&nbsp;:meth:`Flask.teardown_request`&nbsp;but&nbsp;for&nbsp;a&nbsp;blueprint.&nbsp;&nbsp;Such&nbsp;a<br>
+function&nbsp;is&nbsp;executed&nbsp;when&nbsp;tearing&nbsp;down&nbsp;each&nbsp;request,&nbsp;even&nbsp;if&nbsp;outside&nbsp;of<br>
+the&nbsp;blueprint.</tt></dd></dl>
+
+<dl><dt><a name="Blueprint-teardown_request"><strong>teardown_request</strong></a>(self, f)</dt><dd><tt>Like&nbsp;:meth:`Flask.teardown_request`&nbsp;but&nbsp;for&nbsp;a&nbsp;blueprint.&nbsp;&nbsp;This<br>
+function&nbsp;is&nbsp;only&nbsp;executed&nbsp;when&nbsp;tearing&nbsp;down&nbsp;requests&nbsp;handled&nbsp;by&nbsp;a<br>
+function&nbsp;of&nbsp;that&nbsp;blueprint.&nbsp;&nbsp;Teardown&nbsp;request&nbsp;functions&nbsp;are&nbsp;executed<br>
+when&nbsp;the&nbsp;request&nbsp;context&nbsp;is&nbsp;popped,&nbsp;even&nbsp;when&nbsp;no&nbsp;actual&nbsp;request&nbsp;was<br>
+performed.</tt></dd></dl>
+
+<dl><dt><a name="Blueprint-url_defaults"><strong>url_defaults</strong></a>(self, f)</dt><dd><tt>Callback&nbsp;function&nbsp;for&nbsp;URL&nbsp;defaults&nbsp;for&nbsp;this&nbsp;blueprint.&nbsp;&nbsp;It's&nbsp;called<br>
+with&nbsp;the&nbsp;endpoint&nbsp;and&nbsp;values&nbsp;and&nbsp;should&nbsp;update&nbsp;the&nbsp;values&nbsp;passed<br>
+in&nbsp;place.</tt></dd></dl>
+
+<dl><dt><a name="Blueprint-url_value_preprocessor"><strong>url_value_preprocessor</strong></a>(self, f)</dt><dd><tt>Registers&nbsp;a&nbsp;function&nbsp;as&nbsp;URL&nbsp;value&nbsp;preprocessor&nbsp;for&nbsp;this<br>
+blueprint.&nbsp;&nbsp;It's&nbsp;called&nbsp;before&nbsp;the&nbsp;view&nbsp;functions&nbsp;are&nbsp;called&nbsp;and<br>
+can&nbsp;modify&nbsp;the&nbsp;url&nbsp;values&nbsp;provided.</tt></dd></dl>
+
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>warn_on_modifications</strong> = False</dl>
+
+<hr>
+Methods inherited from <a href="flask.helpers.html#_PackageBoundObject">flask.helpers._PackageBoundObject</a>:<br>
+<dl><dt><a name="Blueprint-get_send_file_max_age"><strong>get_send_file_max_age</strong></a>(self, filename)</dt><dd><tt>Provides&nbsp;default&nbsp;cache_timeout&nbsp;for&nbsp;the&nbsp;:func:`send_file`&nbsp;functions.<br>
+&nbsp;<br>
+By&nbsp;default,&nbsp;this&nbsp;function&nbsp;returns&nbsp;``SEND_FILE_MAX_AGE_DEFAULT``&nbsp;from<br>
+the&nbsp;configuration&nbsp;of&nbsp;:data:`~flask.current_app`.<br>
+&nbsp;<br>
+Static&nbsp;file&nbsp;functions&nbsp;such&nbsp;as&nbsp;:func:`send_from_directory`&nbsp;use&nbsp;this<br>
+function,&nbsp;and&nbsp;:func:`send_file`&nbsp;calls&nbsp;this&nbsp;function&nbsp;on<br>
+:data:`~flask.current_app`&nbsp;when&nbsp;the&nbsp;given&nbsp;cache_timeout&nbsp;is&nbsp;`None`.&nbsp;If&nbsp;a<br>
+cache_timeout&nbsp;is&nbsp;given&nbsp;in&nbsp;:func:`send_file`,&nbsp;that&nbsp;timeout&nbsp;is&nbsp;used;<br>
+otherwise,&nbsp;this&nbsp;method&nbsp;is&nbsp;called.<br>
+&nbsp;<br>
+This&nbsp;allows&nbsp;subclasses&nbsp;to&nbsp;change&nbsp;the&nbsp;behavior&nbsp;when&nbsp;sending&nbsp;files&nbsp;based<br>
+on&nbsp;the&nbsp;filename.&nbsp;&nbsp;For&nbsp;example,&nbsp;to&nbsp;set&nbsp;the&nbsp;cache&nbsp;timeout&nbsp;for&nbsp;.js&nbsp;files<br>
+to&nbsp;60&nbsp;seconds::<br>
+&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;class&nbsp;MyFlask(flask.Flask):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;def&nbsp;<a href="#flask.Blueprint-get_send_file_max_age">get_send_file_max_age</a>(self,&nbsp;name):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;name.lower().endswith('.js'):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;60<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;flask.Flask.<a href="#flask.Blueprint-get_send_file_max_age">get_send_file_max_age</a>(self,&nbsp;name)<br>
+&nbsp;<br>
+..&nbsp;versionadded::&nbsp;0.9</tt></dd></dl>
+
+<dl><dt><a name="Blueprint-jinja_loader"><strong>jinja_loader</strong></a>(...)</dt><dd><tt>The&nbsp;Jinja&nbsp;loader&nbsp;for&nbsp;this&nbsp;package&nbsp;bound&nbsp;object.<br>
+&nbsp;<br>
+..&nbsp;versionadded::&nbsp;0.5</tt></dd></dl>
+
+<dl><dt><a name="Blueprint-open_resource"><strong>open_resource</strong></a>(self, resource, mode<font color="#909090">='rb'</font>)</dt><dd><tt>Opens&nbsp;a&nbsp;resource&nbsp;from&nbsp;the&nbsp;application's&nbsp;resource&nbsp;folder.&nbsp;&nbsp;To&nbsp;see<br>
+how&nbsp;this&nbsp;works,&nbsp;consider&nbsp;the&nbsp;following&nbsp;folder&nbsp;structure::<br>
+&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;/myapplication.py<br>
+&nbsp;&nbsp;&nbsp;&nbsp;/schema.sql<br>
+&nbsp;&nbsp;&nbsp;&nbsp;/static<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/style.css<br>
+&nbsp;&nbsp;&nbsp;&nbsp;/templates<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/layout.html<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/index.html<br>
+&nbsp;<br>
+If&nbsp;you&nbsp;want&nbsp;to&nbsp;open&nbsp;the&nbsp;`schema.sql`&nbsp;file&nbsp;you&nbsp;would&nbsp;do&nbsp;the<br>
+following::<br>
+&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;with&nbsp;app.<a href="#flask.Blueprint-open_resource">open_resource</a>('schema.sql')&nbsp;as&nbsp;f:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;contents&nbsp;=&nbsp;f.read()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;do_something_with(contents)<br>
+&nbsp;<br>
+:param&nbsp;resource:&nbsp;the&nbsp;name&nbsp;of&nbsp;the&nbsp;resource.&nbsp;&nbsp;To&nbsp;access&nbsp;resources&nbsp;within<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;subfolders&nbsp;use&nbsp;forward&nbsp;slashes&nbsp;as&nbsp;separator.<br>
+:param&nbsp;mode:&nbsp;resource&nbsp;file&nbsp;opening&nbsp;mode,&nbsp;default&nbsp;is&nbsp;'rb'.</tt></dd></dl>
+
+<dl><dt><a name="Blueprint-send_static_file"><strong>send_static_file</strong></a>(self, filename)</dt><dd><tt>Function&nbsp;used&nbsp;internally&nbsp;to&nbsp;send&nbsp;static&nbsp;files&nbsp;from&nbsp;the&nbsp;static<br>
+folder&nbsp;to&nbsp;the&nbsp;browser.<br>
+&nbsp;<br>
+..&nbsp;versionadded::&nbsp;0.5</tt></dd></dl>
+
+<hr>
+Data descriptors inherited from <a href="flask.helpers.html#_PackageBoundObject">flask.helpers._PackageBoundObject</a>:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>has_static_folder</strong></dt>
+<dd><tt>This&nbsp;is&nbsp;`True`&nbsp;if&nbsp;the&nbsp;package&nbsp;bound&nbsp;object's&nbsp;container&nbsp;has&nbsp;a<br>
+folder&nbsp;named&nbsp;``'static'``.<br>
+&nbsp;<br>
+..&nbsp;versionadded::&nbsp;0.5</tt></dd>
+</dl>
+<dl><dt><strong>static_folder</strong></dt>
+</dl>
+<dl><dt><strong>static_url_path</strong></dt>
+</dl>
+</td></tr></table>
+</body></html>
