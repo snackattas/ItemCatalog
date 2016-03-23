@@ -1,0 +1,180 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: class SQLAlchemy</title>
+<meta charset="utf-8">
+</head><body bgcolor="#f0f0f8">
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><strong>flask_sqlalchemy.SQLAlchemy</strong> = <a name="flask_sqlalchemy.SQLAlchemy">class SQLAlchemy</a>(<a href="__builtin__.html#object">__builtin__.object</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>This&nbsp;class&nbsp;is&nbsp;used&nbsp;to&nbsp;control&nbsp;the&nbsp;SQLAlchemy&nbsp;integration&nbsp;to&nbsp;one<br>
+or&nbsp;more&nbsp;Flask&nbsp;applications.&nbsp;&nbsp;Depending&nbsp;on&nbsp;how&nbsp;you&nbsp;initialize&nbsp;the<br>
+object&nbsp;it&nbsp;is&nbsp;usable&nbsp;right&nbsp;away&nbsp;or&nbsp;will&nbsp;attach&nbsp;as&nbsp;needed&nbsp;to&nbsp;a<br>
+Flask&nbsp;application.<br>
+&nbsp;<br>
+There&nbsp;are&nbsp;two&nbsp;usage&nbsp;modes&nbsp;which&nbsp;work&nbsp;very&nbsp;similarly.&nbsp;&nbsp;One&nbsp;is&nbsp;binding<br>
+the&nbsp;instance&nbsp;to&nbsp;a&nbsp;very&nbsp;specific&nbsp;Flask&nbsp;application::<br>
+&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;app&nbsp;=&nbsp;Flask(__name__)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;db&nbsp;=&nbsp;SQLAlchemy(app)<br>
+&nbsp;<br>
+The&nbsp;second&nbsp;possibility&nbsp;is&nbsp;to&nbsp;create&nbsp;the&nbsp;object&nbsp;once&nbsp;and&nbsp;configure&nbsp;the<br>
+application&nbsp;later&nbsp;to&nbsp;support&nbsp;it::<br>
+&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;db&nbsp;=&nbsp;SQLAlchemy()<br>
+&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;def&nbsp;create_app():<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;app&nbsp;=&nbsp;Flask(__name__)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;db.<a href="#flask_sqlalchemy.SQLAlchemy-init_app">init_app</a>(app)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;app<br>
+&nbsp;<br>
+The&nbsp;difference&nbsp;between&nbsp;the&nbsp;two&nbsp;is&nbsp;that&nbsp;in&nbsp;the&nbsp;first&nbsp;case&nbsp;methods&nbsp;like<br>
+:meth:`create_all`&nbsp;and&nbsp;:meth:`drop_all`&nbsp;will&nbsp;work&nbsp;all&nbsp;the&nbsp;time&nbsp;but&nbsp;in<br>
+the&nbsp;second&nbsp;case&nbsp;a&nbsp;:meth:`flask.Flask.app_context`&nbsp;has&nbsp;to&nbsp;exist.<br>
+&nbsp;<br>
+By&nbsp;default&nbsp;Flask-SQLAlchemy&nbsp;will&nbsp;apply&nbsp;some&nbsp;backend-specific&nbsp;settings<br>
+to&nbsp;improve&nbsp;your&nbsp;experience&nbsp;with&nbsp;them.&nbsp;&nbsp;As&nbsp;of&nbsp;SQLAlchemy&nbsp;0.6&nbsp;SQLAlchemy<br>
+will&nbsp;probe&nbsp;the&nbsp;library&nbsp;for&nbsp;native&nbsp;unicode&nbsp;support.&nbsp;&nbsp;If&nbsp;it&nbsp;detects<br>
+unicode&nbsp;it&nbsp;will&nbsp;let&nbsp;the&nbsp;library&nbsp;handle&nbsp;that,&nbsp;otherwise&nbsp;do&nbsp;that&nbsp;itself.<br>
+Sometimes&nbsp;this&nbsp;detection&nbsp;can&nbsp;fail&nbsp;in&nbsp;which&nbsp;case&nbsp;you&nbsp;might&nbsp;want&nbsp;to&nbsp;set<br>
+`use_native_unicode`&nbsp;(or&nbsp;the&nbsp;``SQLALCHEMY_NATIVE_UNICODE``&nbsp;configuration<br>
+key)&nbsp;to&nbsp;`False`.&nbsp;&nbsp;Note&nbsp;that&nbsp;the&nbsp;configuration&nbsp;key&nbsp;overrides&nbsp;the<br>
+value&nbsp;you&nbsp;pass&nbsp;to&nbsp;the&nbsp;constructor.<br>
+&nbsp;<br>
+This&nbsp;class&nbsp;also&nbsp;provides&nbsp;access&nbsp;to&nbsp;all&nbsp;the&nbsp;SQLAlchemy&nbsp;functions&nbsp;and&nbsp;classes<br>
+from&nbsp;the&nbsp;:mod:`sqlalchemy`&nbsp;and&nbsp;:mod:`sqlalchemy.orm`&nbsp;modules.&nbsp;&nbsp;So&nbsp;you&nbsp;can<br>
+declare&nbsp;models&nbsp;like&nbsp;this::<br>
+&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;class&nbsp;User(db.Model):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;username&nbsp;=&nbsp;db.Column(db.String(80),&nbsp;unique=True)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pw_hash&nbsp;=&nbsp;db.Column(db.String(80))<br>
+&nbsp;<br>
+You&nbsp;can&nbsp;still&nbsp;use&nbsp;:mod:`sqlalchemy`&nbsp;and&nbsp;:mod:`sqlalchemy.orm`&nbsp;directly,&nbsp;but<br>
+note&nbsp;that&nbsp;Flask-SQLAlchemy&nbsp;customizations&nbsp;are&nbsp;available&nbsp;only&nbsp;through&nbsp;an<br>
+instance&nbsp;of&nbsp;this&nbsp;:class:`SQLAlchemy`&nbsp;class.&nbsp;&nbsp;Query&nbsp;classes&nbsp;default&nbsp;to<br>
+:class:`BaseQuery`&nbsp;for&nbsp;`db.Query`,&nbsp;`db.Model.query_class`,&nbsp;and&nbsp;the&nbsp;default<br>
+query_class&nbsp;for&nbsp;`db.relationship`&nbsp;and&nbsp;`db.backref`.&nbsp;&nbsp;If&nbsp;you&nbsp;use&nbsp;these<br>
+interfaces&nbsp;through&nbsp;:mod:`sqlalchemy`&nbsp;and&nbsp;:mod:`sqlalchemy.orm`&nbsp;directly,<br>
+the&nbsp;default&nbsp;query&nbsp;class&nbsp;will&nbsp;be&nbsp;that&nbsp;of&nbsp;:mod:`sqlalchemy`.<br>
+&nbsp;<br>
+..&nbsp;admonition::&nbsp;Check&nbsp;types&nbsp;carefully<br>
+&nbsp;<br>
+&nbsp;&nbsp;&nbsp;Don't&nbsp;perform&nbsp;type&nbsp;or&nbsp;`isinstance`&nbsp;checks&nbsp;against&nbsp;`db.Table`,&nbsp;which<br>
+&nbsp;&nbsp;&nbsp;emulates&nbsp;`Table`&nbsp;behavior&nbsp;but&nbsp;is&nbsp;not&nbsp;a&nbsp;class.&nbsp;`db.Table`&nbsp;exposes&nbsp;the<br>
+&nbsp;&nbsp;&nbsp;`Table`&nbsp;interface,&nbsp;but&nbsp;is&nbsp;a&nbsp;function&nbsp;which&nbsp;allows&nbsp;omission&nbsp;of&nbsp;metadata.<br>
+&nbsp;<br>
+You&nbsp;may&nbsp;also&nbsp;define&nbsp;your&nbsp;own&nbsp;SessionExtension&nbsp;instances&nbsp;as&nbsp;well&nbsp;when<br>
+defining&nbsp;your&nbsp;SQLAlchemy&nbsp;class&nbsp;instance.&nbsp;You&nbsp;may&nbsp;pass&nbsp;your&nbsp;custom&nbsp;instances<br>
+to&nbsp;the&nbsp;`session_extensions`&nbsp;keyword.&nbsp;This&nbsp;can&nbsp;be&nbsp;either&nbsp;a&nbsp;single<br>
+SessionExtension&nbsp;instance,&nbsp;or&nbsp;a&nbsp;list&nbsp;of&nbsp;SessionExtension&nbsp;instances.&nbsp;In&nbsp;the<br>
+following&nbsp;use&nbsp;case&nbsp;we&nbsp;use&nbsp;the&nbsp;VersionedListener&nbsp;from&nbsp;the&nbsp;SQLAlchemy<br>
+versioning&nbsp;examples.::<br>
+&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;from&nbsp;history_meta&nbsp;import&nbsp;VersionedMeta,&nbsp;VersionedListener<br>
+&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;app&nbsp;=&nbsp;Flask(__name__)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;db&nbsp;=&nbsp;SQLAlchemy(app,&nbsp;session_extensions=[VersionedListener()])<br>
+&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;class&nbsp;User(db.Model):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;__metaclass__&nbsp;=&nbsp;VersionedMeta<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;username&nbsp;=&nbsp;db.Column(db.String(80),&nbsp;unique=True)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pw_hash&nbsp;=&nbsp;db.Column(db.String(80))<br>
+&nbsp;<br>
+The&nbsp;`session_options`&nbsp;parameter&nbsp;can&nbsp;be&nbsp;used&nbsp;to&nbsp;override&nbsp;session<br>
+options.&nbsp;&nbsp;If&nbsp;provided&nbsp;it's&nbsp;a&nbsp;dict&nbsp;of&nbsp;parameters&nbsp;passed&nbsp;to&nbsp;the<br>
+session's&nbsp;constructor.<br>
+&nbsp;<br>
+..&nbsp;versionadded::&nbsp;0.10<br>
+&nbsp;&nbsp;&nbsp;The&nbsp;`session_options`&nbsp;parameter&nbsp;was&nbsp;added.<br>
+&nbsp;<br>
+..&nbsp;versionadded::&nbsp;0.16<br>
+&nbsp;&nbsp;&nbsp;`scopefunc`&nbsp;is&nbsp;now&nbsp;accepted&nbsp;on&nbsp;`session_options`.&nbsp;It&nbsp;allows&nbsp;specifying<br>
+&nbsp;&nbsp;&nbsp;&nbsp;a&nbsp;custom&nbsp;function&nbsp;which&nbsp;will&nbsp;define&nbsp;the&nbsp;SQLAlchemy&nbsp;session's&nbsp;scoping.<br>
+&nbsp;<br>
+..&nbsp;versionadded::&nbsp;2.1<br>
+&nbsp;&nbsp;&nbsp;The&nbsp;`metadata`&nbsp;parameter&nbsp;was&nbsp;added.&nbsp;This&nbsp;allows&nbsp;for&nbsp;setting&nbsp;custom<br>
+&nbsp;&nbsp;&nbsp;naming&nbsp;conventions&nbsp;among&nbsp;other,&nbsp;non-trivial&nbsp;things.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="SQLAlchemy-__init__"><strong>__init__</strong></a>(self, app<font color="#909090">=None</font>, use_native_unicode<font color="#909090">=True</font>, session_options<font color="#909090">=None</font>, metadata<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="SQLAlchemy-__repr__"><strong>__repr__</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="SQLAlchemy-apply_driver_hacks"><strong>apply_driver_hacks</strong></a>(self, app, info, options)</dt><dd><tt>This&nbsp;method&nbsp;is&nbsp;called&nbsp;before&nbsp;engine&nbsp;creation&nbsp;and&nbsp;used&nbsp;to&nbsp;inject<br>
+driver&nbsp;specific&nbsp;hacks&nbsp;into&nbsp;the&nbsp;options.&nbsp;&nbsp;The&nbsp;`options`&nbsp;parameter&nbsp;is<br>
+a&nbsp;dictionary&nbsp;of&nbsp;keyword&nbsp;arguments&nbsp;that&nbsp;will&nbsp;then&nbsp;be&nbsp;used&nbsp;to&nbsp;call<br>
+the&nbsp;:func:`sqlalchemy.create_engine`&nbsp;function.<br>
+&nbsp;<br>
+The&nbsp;default&nbsp;implementation&nbsp;provides&nbsp;some&nbsp;saner&nbsp;defaults&nbsp;for&nbsp;things<br>
+like&nbsp;pool&nbsp;sizes&nbsp;for&nbsp;MySQL&nbsp;and&nbsp;sqlite.&nbsp;&nbsp;Also&nbsp;it&nbsp;injects&nbsp;the&nbsp;setting&nbsp;of<br>
+`SQLALCHEMY_NATIVE_UNICODE`.</tt></dd></dl>
+
+<dl><dt><a name="SQLAlchemy-apply_pool_defaults"><strong>apply_pool_defaults</strong></a>(self, app, options)</dt></dl>
+
+<dl><dt><a name="SQLAlchemy-create_all"><strong>create_all</strong></a>(self, bind<font color="#909090">='__all__'</font>, app<font color="#909090">=None</font>)</dt><dd><tt>Creates&nbsp;all&nbsp;tables.<br>
+&nbsp;<br>
+..&nbsp;versionchanged::&nbsp;0.12<br>
+&nbsp;&nbsp;&nbsp;Parameters&nbsp;were&nbsp;added</tt></dd></dl>
+
+<dl><dt><a name="SQLAlchemy-create_scoped_session"><strong>create_scoped_session</strong></a>(self, options<font color="#909090">=None</font>)</dt><dd><tt>Helper&nbsp;factory&nbsp;method&nbsp;that&nbsp;creates&nbsp;a&nbsp;scoped&nbsp;session.&nbsp;&nbsp;It<br>
+internally&nbsp;calls&nbsp;:meth:`create_session`.</tt></dd></dl>
+
+<dl><dt><a name="SQLAlchemy-create_session"><strong>create_session</strong></a>(self, options)</dt><dd><tt>Creates&nbsp;the&nbsp;session.&nbsp;&nbsp;The&nbsp;default&nbsp;implementation&nbsp;returns&nbsp;a<br>
+:class:`SignallingSession`.<br>
+&nbsp;<br>
+..&nbsp;versionadded::&nbsp;2.0</tt></dd></dl>
+
+<dl><dt><a name="SQLAlchemy-drop_all"><strong>drop_all</strong></a>(self, bind<font color="#909090">='__all__'</font>, app<font color="#909090">=None</font>)</dt><dd><tt>Drops&nbsp;all&nbsp;tables.<br>
+&nbsp;<br>
+..&nbsp;versionchanged::&nbsp;0.12<br>
+&nbsp;&nbsp;&nbsp;Parameters&nbsp;were&nbsp;added</tt></dd></dl>
+
+<dl><dt><a name="SQLAlchemy-get_app"><strong>get_app</strong></a>(self, reference_app<font color="#909090">=None</font>)</dt><dd><tt>Helper&nbsp;method&nbsp;that&nbsp;implements&nbsp;the&nbsp;logic&nbsp;to&nbsp;look&nbsp;up&nbsp;an&nbsp;application.</tt></dd></dl>
+
+<dl><dt><a name="SQLAlchemy-get_binds"><strong>get_binds</strong></a>(self, app<font color="#909090">=None</font>)</dt><dd><tt>Returns&nbsp;a&nbsp;dictionary&nbsp;with&nbsp;a&nbsp;table-&gt;engine&nbsp;mapping.<br>
+&nbsp;<br>
+This&nbsp;is&nbsp;suitable&nbsp;for&nbsp;use&nbsp;of&nbsp;sessionmaker(binds=db.<a href="#flask_sqlalchemy.SQLAlchemy-get_binds">get_binds</a>(app)).</tt></dd></dl>
+
+<dl><dt><a name="SQLAlchemy-get_engine"><strong>get_engine</strong></a>(self, app, bind<font color="#909090">=None</font>)</dt><dd><tt>Returns&nbsp;a&nbsp;specific&nbsp;engine.<br>
+&nbsp;<br>
+..&nbsp;versionadded::&nbsp;0.12</tt></dd></dl>
+
+<dl><dt><a name="SQLAlchemy-get_tables_for_bind"><strong>get_tables_for_bind</strong></a>(self, bind<font color="#909090">=None</font>)</dt><dd><tt>Returns&nbsp;a&nbsp;list&nbsp;of&nbsp;all&nbsp;tables&nbsp;relevant&nbsp;for&nbsp;a&nbsp;bind.</tt></dd></dl>
+
+<dl><dt><a name="SQLAlchemy-init_app"><strong>init_app</strong></a>(self, app)</dt><dd><tt>This&nbsp;callback&nbsp;can&nbsp;be&nbsp;used&nbsp;to&nbsp;initialize&nbsp;an&nbsp;application&nbsp;for&nbsp;the<br>
+use&nbsp;with&nbsp;this&nbsp;database&nbsp;setup.&nbsp;&nbsp;Never&nbsp;use&nbsp;a&nbsp;database&nbsp;in&nbsp;the&nbsp;context<br>
+of&nbsp;an&nbsp;application&nbsp;not&nbsp;initialized&nbsp;that&nbsp;way&nbsp;or&nbsp;connections&nbsp;will<br>
+leak.</tt></dd></dl>
+
+<dl><dt><a name="SQLAlchemy-make_connector"><strong>make_connector</strong></a>(self, app, bind<font color="#909090">=None</font>)</dt><dd><tt>Creates&nbsp;the&nbsp;connector&nbsp;for&nbsp;a&nbsp;given&nbsp;state&nbsp;and&nbsp;bind.</tt></dd></dl>
+
+<dl><dt><a name="SQLAlchemy-make_declarative_base"><strong>make_declarative_base</strong></a>(self, metadata<font color="#909090">=None</font>)</dt><dd><tt>Creates&nbsp;the&nbsp;declarative&nbsp;base.</tt></dd></dl>
+
+<dl><dt><a name="SQLAlchemy-reflect"><strong>reflect</strong></a>(self, bind<font color="#909090">='__all__'</font>, app<font color="#909090">=None</font>)</dt><dd><tt>Reflects&nbsp;tables&nbsp;from&nbsp;the&nbsp;database.<br>
+&nbsp;<br>
+..&nbsp;versionchanged::&nbsp;0.12<br>
+&nbsp;&nbsp;&nbsp;Parameters&nbsp;were&nbsp;added</tt></dd></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>engine</strong></dt>
+<dd><tt>Gives&nbsp;access&nbsp;to&nbsp;the&nbsp;engine.&nbsp;&nbsp;If&nbsp;the&nbsp;database&nbsp;configuration&nbsp;is&nbsp;bound<br>
+to&nbsp;a&nbsp;specific&nbsp;application&nbsp;(initialized&nbsp;with&nbsp;an&nbsp;application)&nbsp;this&nbsp;will<br>
+always&nbsp;return&nbsp;a&nbsp;database&nbsp;connection.&nbsp;&nbsp;If&nbsp;however&nbsp;the&nbsp;current&nbsp;application<br>
+is&nbsp;used&nbsp;this&nbsp;might&nbsp;raise&nbsp;a&nbsp;:exc:`RuntimeError`&nbsp;if&nbsp;no&nbsp;application&nbsp;is<br>
+active&nbsp;at&nbsp;the&nbsp;moment.</tt></dd>
+</dl>
+<dl><dt><strong>metadata</strong></dt>
+<dd><tt>Returns&nbsp;the&nbsp;metadata</tt></dd>
+</dl>
+</td></tr></table>
+</body></html>
