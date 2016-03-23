@@ -12,3 +12,4 @@ pip install SQLAlchemy-ImageAttach
 pip install Flask-Moment
 pip install Flask-SQLAlchemy
 pip install Flask-WTF
+pip install blinker

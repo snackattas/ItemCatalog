@@ -12,6 +12,11 @@ from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import union, null, literal_column
 from databaseSetup import app, db
+from functools import wraps
+
+from flask.ext.sqlalchemy import models_committed, before_models_committed
+import logging
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # app = Flask(__name__)
 moment = Moment(app)
@@ -22,6 +27,48 @@ moment = Moment(app)
 # app.debug=True
 # db = SQLAlchemy(app)
 session = db.session
+# @before_models_committed.connect_via(app)
+# def on_models_committed(sender, changes):
+#     logging.debug(sender)
+#     raise
+#     for change in changes:
+#         logging.debug(change[0].__class__)
+#         logging.debug(change[0].__delattr__)
+#         logging.debug(change[0].__dict__)
+#         logging.debug(change[0].__doc__)
+#         logging.debug(change[0].__tablename__)
+#         logging.debug(change[0].id)
+#         logging.debug(change[0].metadata)
+#         logging.debug(change[0].name)
+#         logging.debug(change[0].picture)
+#         logging.debug(change[0].query)
+#         logging.debug(change[0].query_class)
+#         logging.debug(change[1])
+#models_committed.connect(on_models_committed)
+
+def requires_login_category(function):
+    @wraps(function)
+    def decorated_function(*args, **kwargs):
+        if 'username' not in login_session:
+            if function.__name__ != 'showCategory':
+                flash('You need to be signed in to contribute to the database')
+            return redirect(url_for('showPublicCategory'))
+        return function(*args, **kwargs)
+    return decorated_function
+
+def requires_login_item(function):
+    @wraps(function)
+    def decorated_function(*args, **kwargs):
+        if 'username' not in login_session:
+            flash('You need to be signed in to contribute to the database')
+            return redirect(url_for('showPublicItem', category_id=kwargs['category_id']))
+        category = Category.query.filter_by(id=kwargs['category_id']).one()
+        if category.user_id != login_session['user_id']:
+            if function.__name__ != 'showItem':
+                flash('Only the creator of this item can edit it')
+            return redirect(url_for('showPublicItem', category_id=kwargs['category_id']))
+        return function(*args, **kwargs)
+    return decorated_function
 
 
 def createUser(login_session):
@@ -315,10 +362,10 @@ def latestAdditions():
     return ['a','b']
 
 # Show all restaurants
+
 @app.route('/category/')
+@requires_login_category
 def showCategory():
-    if 'username' not in login_session:
-        return redirect(url_for('showPublicCategory'))
     categories = Category.query.order_by(db.asc(Category.name))
     no_categories = False
     try:
@@ -341,6 +388,7 @@ def showPublicCategory():
         no_categories = True
     return render_template('publicCategory.html', categories=categories, no_categories=no_categories, latest_additions=latestAdditions())
 
+@app.route('/publicCategory/<int:category_id>/')
 @app.route('/publicCategory/<int:category_id>/publicItem/')
 def showPublicItem(category_id):
     category = Category.query.filter_by(id=category_id).one()
@@ -349,10 +397,10 @@ def showPublicItem(category_id):
     creator = User.query.filter_by(id=category.user_id).one()
     return render_template('publicItem.html', items=items, category=category, creator=creator)
 
+
 @app.route('/category/new/', methods=['GET', 'POST'])
+@requires_login_category
 def newCategory():
-    if 'username' not in login_session:
-        return redirect(url_for('showPublicCategory'))
     if request.method == 'POST':
         newCategory = Category(name=request.form['name'], user_id=login_session['user_id'])
         session.add(newCategory)
@@ -363,9 +411,8 @@ def newCategory():
 
 # Edit a category
 @app.route('/category/<int:category_id>/edit/', methods=['GET', 'POST'])
+@requires_login_category
 def editCategory(category_id):
-    if 'username' not in login_session:
-        return redirect(url_for('showPublicCategory'))
     category = Category.query.filter_by(id=category_id).one()
     user_id = category.user_id
     ### I have a feeling this will need to be reworked
@@ -383,9 +430,8 @@ def editCategory(category_id):
 
 # Delete a category
 @app.route('/category/<int:category_id>/delete/', methods=['GET', 'POST'])
+@requires_login_category
 def deleteCategory(category_id):
-    if 'username' not in login_session:
-        return redirect(url_for('showPublicCategory'))
     category_to_delete = Category.query.filter_by(id=category_id).one()
     user_id = category_to_delete.user_id
     if user_id != login_session['user_id']:
@@ -401,9 +447,10 @@ def deleteCategory(category_id):
 # Show a category's item
 @app.route('/category/<int:category_id>/')
 @app.route('/category/<int:category_id>/item/')
+@requires_login_item
 def showItem(category_id):
-    if 'username' not in login_session:
-        return redirect(url_for('showPublicItem', category_id=category_id))
+    # if 'username' not in login_session:
+    #     return redirect(url_for('showPublicItem', category_id=category_id))
     category = Category.query.filter_by(id=category_id).one()
     items = Item.query.filter_by(category_id=category_id).all()
     creator = User.query.filter_by(id=category.user_id).one()
@@ -411,16 +458,17 @@ def showItem(category_id):
 
 # Create a new item
 @app.route('/category/<int:category_id>/item/new/', methods=['GET', 'POST'])
+@requires_login_item
 def newItem(category_id):
-    if 'username' not in login_session:
-        return redirect(url_for('showPublicCategory'))
+    # if 'username' not in login_session:
+    #     return redirect(url_for('showPublicCategory'))
     category = Category.query.filter_by(id=category_id).one()
-    user_id = category.user_id
-    if user_id != login_session['user_id']:
-        return redirect(url_for('showCategory'))
+    # user_id = category.user_id
+    # if user_id != login_session['user_id']:
+    #     return redirect(url_for('showCategory'))
     if request.method == 'POST':
         newItem = Item(name=request.form['name'], description=request.form[
-                           'description'], category_id=category_id, user_id=user_id)
+                           'description'], category_id=category_id, user_id=category.user_id)
         session.add(newItem)
         session.commit()
         flash('New Item %s Successfully Created' % (newItem.name))
@@ -430,13 +478,14 @@ def newItem(category_id):
 
 # Edit a menu item
 @app.route('/category/<int:category_id>/item/<int:item_id>/edit/', methods=['GET', 'POST'])
+@requires_login_item
 def editItem(category_id, item_id):
-    if 'username' not in login_session:
-        return redirect(url_for('showPublicCategory'))
+    # if 'username' not in login_session:
+    #     return redirect(url_for('showPublicCategory'))
     edited_item = Item.query.filter_by(id=item_id, category_id=category_id).one()
-    user_id = edited_item.user_id
-    if user_id != login_session['user_id']:
-        return redirect(url_for('showCategory'))
+    # user_id = edited_item.user_id
+    # if user_id != login_session['user_id']:
+    #     return redirect(url_for('showCategory'))
     if request.method == 'POST':
         if request.form['name']:
             edited_item.name = request.form['name']
@@ -450,13 +499,14 @@ def editItem(category_id, item_id):
 
 # Delete a menu item
 @app.route('/category/<int:category_id>/item/<int:item_id>/delete/', methods=['GET', 'POST'])
+@requires_login_item
 def deleteItem(category_id, item_id):
-    if 'username' not in login_session:
-        return redirect(url_for('showPublicCategory'))
+    # if 'username' not in login_session:
+    #     return redirect(url_for('showPublicCategory'))
     item_to_delete = Item.query.filter_by(id=item_id, category_id=category_id).one()
     user_id = item_to_delete.user_id
-    if user_id != login_session['user_id']:
-        return redirect(url_for('showCategory'))
+    # if user_id != login_session['user_id']:
+    #     return redirect(url_for('showCategory'))
     if request.method == 'POST':
         session.delete(item_to_delete)
         session.commit()
