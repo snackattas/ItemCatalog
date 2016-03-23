@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, jsonify, url_for, flash, make_response
 from flask import session as login_session
-from databaseSetup import User, Category, Item
+from databaseSetup import User, Category, Item, ChangeLog
 import random
 import string
 from oauth2client.client import flow_from_clientsecrets, FlowExchangeError
@@ -13,6 +13,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import union, null, literal_column
 from databaseSetup import app, db
 from functools import wraps
+import datetime
 
 from flask.ext.sqlalchemy import models_committed, before_models_committed
 import logging
@@ -413,20 +414,34 @@ def newCategory():
 @app.route('/category/<int:category_id>/edit/', methods=['GET', 'POST'])
 @requires_login_category
 def editCategory(category_id):
-    category = Category.query.filter_by(id=category_id).one()
-    user_id = category.user_id
-    ### I have a feeling this will need to be reworked
-    if user_id != login_session['user_id']:
-        return redirect(url_for('showCategory'))
-    editedCategory = Category.query.filter_by(id=category_id).one()
+    edited_category = Category.query.filter_by(id=category_id).one()
     if request.method == 'POST':
         if request.form['name']:
-            editedCategory.name = request.form['name']
+            now = datetime.datetime.utcnow()
+            change_log = ChangeLog(user_id=edited_category.user_id,
+                                   old_category_name = edited_category.name,
+                                   new_category_name = request.form['name'],
+                                   old_instant_of_creation = edited_category.instant_of_creation,
+                                   new_instant_of_creation = now,
+                                   action="update")
+            session.add(change_log)
+            edited_category.name = request.form['name']
+            edited_category.instant_of_creation = now
             session.commit()
-            flash('Category Successfully Edited %s' % editedCategory.name)
+            flash('Category Successfully Edited %s' % edited_category.name)
             return redirect(url_for('showCategory'))
     else:
-        return render_template('editCategory.html', category=editedCategory, login_session=login_session)
+        return render_template('editCategory.html', category=edited_category, login_session=login_session)
+
+
+    # old_category_name = db.Column(db.String(80))
+    # new_category_name = db.Column(db.String(80))
+    # old_item_name = db.Column(db.String(80))
+    # new_item_name = db.Column(db.String(80))
+    # old_instant_of_creation = db.Column(db.DateTime(timezone=True))
+    # new_instant_of_creation = db.Column(db.DateTime(timezone=True), default=datetime.datetime.utcnow)
+    # action = db.Column(db.String(10))
+
 
 # Delete a category
 @app.route('/category/<int:category_id>/delete/', methods=['GET', 'POST'])

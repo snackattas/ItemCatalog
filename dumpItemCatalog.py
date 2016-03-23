@@ -1,6 +1,6 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from databaseSetup import User, Category, Item
+from databaseSetup import User, Category, Item, ChangeLog
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///itemCatalog.db'

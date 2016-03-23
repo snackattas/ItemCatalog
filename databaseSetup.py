@@ -58,18 +58,19 @@ class Item(db.Model):
            'description'         : self.description,
            'id'                  : self.id,
        }
-# 
-# class ChangeLog(db.Model):
-#     __tablename__ = 'changelog'
-#     id = db.Column(db.Integer, primary_key = True)
-#     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-#     user = db.relationship(User)
-#     old_category_name = db.Column(db.String(80))
-#     new_category_name = db.Column(db.String(80))
-#     old_item_name = db.Column(db.String(80))
-#     new_item_name = db.Column(db.String(80))
-#     old_instant_of_creation = db.Column(db.DateTime(timezone=True))
-#     new_instant_of_creation = db.Column(db.DateTime(timezone=True), default=datetime.datetime.utcnow)
-#     action = db.Column(db.String(10))
+#
+class ChangeLog(db.Model):
+    __tablename__ = 'changelog'
+    id = db.Column(db.Integer, primary_key = True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user = db.relationship(User)
+    old_category_name = db.Column(db.String(80))
+    new_category_name = db.Column(db.String(80))
+    old_item_name = db.Column(db.String(80))
+    new_item_name = db.Column(db.String(80))
+    old_instant_of_creation = db.Column(db.DateTime(timezone=True))
+    new_instant_of_creation = db.Column(db.DateTime(timezone=True), default=datetime.datetime.utcnow)
+    action = db.Column(db.String(6))
+    table = db.Column(db.String(9))
 #
 db.create_all()
