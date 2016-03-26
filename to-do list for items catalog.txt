@@ -1,39 +1,40 @@
 ideas:
-restaurant/menu splash screen using jinjaq2, enumerate python function to create a new line after every third thing
-col(4)
--where to put javascript?  In main? In footer?
--can I have a separate python file for oauth stuff
--can I have a separate folder directory for client_secrets
--login page
--instructional videos on foundations
-- http://thefoxisblack.com/desktop-wallpaper/travis-ladue-desktop-2560x1440.jpeghttp://starwallpapers.com/walls/mood_things_notebook_stationery_hd_wallpaper-wide.jpg
-- better image entry for item/category
-- ajax request for loading items to pages
-- latest item functionality? Can you do a sqlalchemy request that combines category and item tables and sorts by latest?
-- Logout button
-- cool login screen
+- restaurant/menu splash screen using jinjaq2, enumerate python function to create
+- SQLAlchemy-ImageAttach image entry
+  - new tables to hold info
+  - Also accept URLs
+- get rid of with and contextmanager.  Properly invoke db and do db calls
+- Get requireslogin wrappers up and running
+- find best place for error router, in init or in CRUD?
+- config.py file
+- Add javascript validation in HTML to edit/new html files
+- add __init__ and pgk support
+  - initialize all modules correctly
+- explore flask WTF for CSFR security
+-explore ATOM or RSS APIs
+- PEP8-ify code
+- comment code
+- Write readme
 
-- add bleach support!
+-stylize:
+  -a new line after every third thing
+  -col(4)
+  -Make login modal
+  -take out raw html in python for login page
+  -make buttons for all categories and login/logout
+  -resize login user picture in upper left
+  -instructional videos on foundations
+  -wallpaper
+    -http://thefoxisblack.com/desktop-wallpaper/travis-ladue-desktop-2560x1440.jpeghttp://starwallpapers.com/walls/mood_things_notebook_stationery_hd_wallpaper-wide.jpg
+  - ajax request for loading items to pages
+  - stylize latest item functionality
 
 
-
-STEPS
-Consolidate disconnect functions and put them in header!
-categorify all files!
-
-- double check flash messages, make sure they have appropriate string substitution
-- move the category edit name to the category screen. Also create a delete category function/link, put it in the same place
--block against null entries. Maybe do it in javascript!
--maybe some kind of style switch on the category page to indicate that I've created a category?
-- delete old google/facebook restaurant app and create new category oauth stuff.  Wait I just renamed it!??!
-- for images just have blob url
--flask wtf features for https://flask-wtf.readthedocs.org/en/latest/
--maybe do it in python
--flask packages for moving oauth files to another py module
-
-- if you get image attach working, put the URL in the JSON readers
-- make latestaddition work in local time, and correct time that it's showing. it's showing the wrong time!
-
+VALIDATION
+  - double check flash messages, make sure they have appropriate string substitution
+  - double check all types of latest addition
+  - check for null entries in new/edit pages
+  - double check pg_config that only necessary modules downloaded
 
 images
 https://discussions.udacity.com/t/sqlalchemy-imageattach/159443

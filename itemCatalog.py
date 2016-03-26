@@ -453,7 +453,8 @@ def newItem(category_id):
             return redirect(url_for('showCategory'))
         if request.method == 'POST':
             newItem = Item(name=request.form['name'], description=request.form[
-                               'description'], category_id=category_id)
+                               'description'], category_id=category_id,
+                               user_id=user_id)
             session.add(newItem)
             session.commit()
             flash('New Item %s Successfully Created' % (newItem.name))
@@ -499,7 +500,7 @@ def deleteItem(category_id, item_id):
         if request.method == 'POST':
             session.delete(item_to_delete)
             session.commit()
-            flash('Item Successfully Deleted')
+            flash('Item %s Successfully Deleted' % (item_to_delete.name))
             return redirect(url_for('showItem', category_id=category_id))
         else:
             return render_template('deleteItem.html', item=item_to_delete, login_session=login_session)

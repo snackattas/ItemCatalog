@@ -17,9 +17,9 @@ for user in users:
     print "user ID: " + str(user.id)
     print "name: " + user.name
     print "email: " + user.email
-    print "picture: " + user.picture
     print "facebook id: %s" % (user.facebook_id)
     print "gplus id: %s" % (user.gplus_id)
+    print dir(user.picture)
 
 
 print '\n'
