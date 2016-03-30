@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, redirect, jsonify, url_for, f
 from flask import session as login_session
 from sqlalchemy import create_engine, asc, desc, union, null, literal_column, ForeignKey
 from sqlalchemy.orm import sessionmaker
-from databaseSetup import Base, User, Category, Item, UserImages, CategoryImages, ItemImages
+from databaseSetup import Base, User, Category, Item, CategoryImage, ItemImage
 import random
 import string
 from oauth2client.client import flow_from_clientsecrets, FlowExchangeError
@@ -55,7 +55,18 @@ def test_add(user_id):
         #img = 'http://g-ecx.images-amazon.com/images/G/01/img15/pet-products/small-tiles/23695_pets_vertical_store_dogs_small_tile_8._CB312176604_.jpg'
 
         with open(img, 'rb') as f:
-            user.picture.from_blob(f.read())
+            user.picture.from_file(f.read())
+            session.add(user)
+            session.commit()
+
+def addz(user_id):
+    with store_context(store):
+        user = session.query(User).get(int(user_id))
+        img = '/Users/Zach/Desktop/back.jpg'
+        #img = 'http://g-ecx.images-amazon.com/images/G/01/img15/pet-products/small-tiles/23695_pets_vertical_store_dogs_small_tile_8._CB312176604_.jpg'
+
+        with open(img, 'rb') as f:
+            user.picture.from_file(f.read())
             session.add(user)
             session.commit()
 
@@ -68,7 +79,7 @@ def recover():
         print "facebook id: %s" % (user.facebook_id)
         print "gplus id: %s" % (user.gplus_id)
         print dir(user.picture)
-    imagey = session.query(UserImages).all()
+    imagey = session.query(CategoryImage).all()
     print len(imagey)
     for im in imagey:
         print im.user_id
@@ -80,11 +91,13 @@ def recover():
         print im.created_at
         print im.metadata
 def addUser():
-    User1 = User(name='Zach Attas Google',
-                 email='zach.attas@gmail.com',
-                 gplus_id='116711155115807702320')
-    session.add(User1)
-    session.commit()
+    with store_context(store):
+        picture_url='http://g-ecx.images-amazon.com/images/G/01/img15/pet-products/small-tiles/23695_pets_vertical_store_dogs_small_tile_8._CB312176604_.jpg'
+        User1 = User(name='Zach Attas Google',
+                     email='zach.attas@gmail.com',
+                     gplus_id='116711155115807702320')
+        session.add(User1)
+        session.commit()
 
 def set_picture_url(user_id):
     try:
@@ -116,3 +129,7 @@ def addcatpick():
         category.picture.from_file(urlopen(picture_url))
         session.add(category)
         session.commit()
+
+UPLOAD_FOLDER = '/images/'
+ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
+app.config

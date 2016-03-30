@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, redirect, jsonify, url_for, f
 from flask import session as login_session
 from sqlalchemy import create_engine, asc, desc, union, null, literal_column, ForeignKey
 from sqlalchemy.orm import sessionmaker
-from databaseSetup import Base, User, Category, Item
+from databaseSetup import Base, User, Category, Item, CategoryImage, ItemImage
 import random
 import string
 from oauth2client.client import flow_from_clientsecrets, FlowExchangeError
@@ -12,6 +12,10 @@ import requests
 from contextlib import contextmanager
 from flask_moment import Moment
 import sqlalchemy.exc
+from sqlalchemy_imageattach.entity import Image, image_attachment
+from sqlalchemy_imageattach.context import store_context
+from sqlalchemy_imageattach.stores.fs import HttpExposedFileSystemStore
+from urllib2 import urlopen
 
 app = Flask(__name__)
 moment = Moment(app)
@@ -20,6 +24,18 @@ APPLICATION_NAME = "Item Catalog Application"
 engine = create_engine('sqlite:///itemCatalog.db')
 Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
+
+store = HttpExposedFileSystemStore(
+    path='/var/local/ItemCatalog/images',
+    prefix='static/images/'
+)
+# store = HttpExposedFileSystemStore(
+#     path='categoryimage',
+#     prefix='/images/'
+# )
+
+app.wsgi_app = store.wsgi_middleware(app.wsgi_app)
+
 
 @contextmanager
 def get_session():
@@ -33,6 +49,30 @@ def get_session():
         session.commit()
     except:
         redirect(url_for('pageNotFound', error=404))
+
+from sqlalchemy_imageattach.context import store_context
+def set_picture(pic, user_id):
+    try:
+        user = session.query(User).get(int(user_id))
+        with store_context(store):
+            #user.picture.from_file(request.files['picture'])
+            user.picture.from_file(pic)
+    except Exception:
+        session.rollback()
+        raise
+    session.commit()
+
+from urllib2 import urlopen
+def set_picture_url(request, user_id):
+    try:
+        user = session.query(User).get(int(user_id))
+        picture_url = request.values['picture_url']
+        with store_context(store):
+            user.picture.from_file(urlopen(picture_url))
+    except Exception:
+        session.rollback()
+        raise
+    session.commit()
 
 
 def createUser(login_session):
@@ -382,12 +422,22 @@ def newCategory():
     if 'username' not in login_session:
         return redirect(url_for('showPublicCategory'))
     if request.method == 'POST':
-        with get_session() as session:
-            newCategory = Category(name=request.form['name'], user_id=login_session['user_id'])
+        session= DBSession()
+        newCategory = Category(name=request.form['name'], user_id=login_session['user_id'])
+        with store_context(store):
+            if request.form.get('category_url'):
+                newCategory.picture.from_file(urlopen(request.form['category_url']))
+            if request.form.get('category_image'):
+                #newCategory.picture.from_file(open(request.form['category_image'], 'rb').read())
+                newCategory.picture.from_blob(open(request.files['category_image'], 'rb').read())
+                print newCategory.picture
             session.add(newCategory)
+            print newCategory.picture
+            session.commit()
         return redirect(url_for('showCategory'))
     else:
         return render_template('newCategory.html', login_session=login_session)
+
 
 # Edit a category
 @app.route('/category/<int:category_id>/edit/', methods=['GET', 'POST'])

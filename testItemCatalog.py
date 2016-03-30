@@ -21,7 +21,6 @@ def get_session():
 with get_session() as session:
     User1 = User(name='Zach Attas Google',
                  email='zach.attas@gmail.com',
-                 picture='https://upload.wikimedia.org/wikipedia/commons/4/4d/Cat_March_2010-1.jpg',
                  gplus_id='116711155115807702320')
     User2 = User(name='Zach Attas Wesleyan',
                  email='zattas@wesleyan.edu',

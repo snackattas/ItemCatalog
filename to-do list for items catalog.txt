@@ -38,7 +38,6 @@ VALIDATION
 
 images
 https://discussions.udacity.com/t/sqlalchemy-imageattach/159443
-https://discussions.udacity.com/t/images-and-blobs-in-databases/24503
 https://discussions.udacity.com/t/sqlalchemy-imageattach/42244
 
 WTFforms

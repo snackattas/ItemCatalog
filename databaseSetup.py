@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, BigInteger
+from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, BigInteger, LargeBinary
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy import create_engine
@@ -12,7 +12,7 @@ class User(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(80), nullable = False)
     email = Column(String(80))
-    picture = image_attachment('UserImage')
+    picture = Column(LargeBinary)
     facebook_id = Column(String(80))
     gplus_id = Column(String(80))
 
@@ -56,10 +56,6 @@ class Item(Base):
            'id'                  : self.id,
        }
 
-class UserImage(Base, Image):
-    __tablename__ = 'userimage'
-    user_id = Column(Integer, ForeignKey('user.id'), primary_key=True)
-    user = relationship(User)
 
 class CategoryImage(Base, Image):
     __tablename__ = 'categoryimage'
