@@ -28,7 +28,7 @@
   {% endwith %}
 </div>
 
-<div class="recent-activity">
+<!-- <div class="recent-activity">
 Recent Activity
 <ul>
 {% for category_and_item in latest_additions %}
@@ -40,7 +40,7 @@ Recent Activity
 	{% endif %}
 {% endfor %}
 </ul>
-</div>
+</div> -->
 
 	<div class="row padding-top padding-bottom">
 		<div class="col-md-1"></div>
@@ -63,6 +63,7 @@ Recent Activity
 			<div class="col-md-1"></div>
 		</div>
 	</a>
+	<img class="category-image" src="{{category.picture.locate()}}">
 {% endfor %}
 {% if no_categories == True %}
 	<div class="col-md-1"></div>

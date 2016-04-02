@@ -361,15 +361,20 @@ def latestAdditions():
 @app.route('/category/')
 def showCategory():
     if 'username' not in login_session:
+        logging.debug(login_session)
         return redirect(url_for('showPublicCategory'))
     with get_session() as session:
         categories = session.query(Category).order_by(asc(Category.name))
+        logging.debug(login_session)
+        logging.debug("in show cat")
         no_categories = False
         try:
             content = categories[0]
         except:
             no_categories = True
-        return render_template('category.html', categories=categories, login_session=login_session, no_categories=no_categories, latest_additions=latestAdditions())
+        logging.debug("in show cat")
+    with store_context(store):
+        return render_template('category.html', categories=categories, login_session=login_session, no_categories=no_categories)
 
 # Public face of Restaurant database
 @app.route('/')
@@ -382,7 +387,8 @@ def showPublicCategory():
             content = categories[0]
         except:
             no_categories = True
-        return render_template('publicCategory.html', categories=categories, no_categories=no_categories, latest_additions=latestAdditions())
+        return render_template('publicCategory.html', categories=categories, no_categories=no_categories)
+        # return render_template('publicCategory.html', categories=categories, no_categories=no_categories, latest_additions=latestAdditions())
 
 @app.route('/publicCategory/<int:category_id>/publicItem/')
 def showPublicItem(category_id):
@@ -393,18 +399,9 @@ def showPublicItem(category_id):
         creator = session.query(User).filter_by(id=category.user_id).one()
         return render_template('publicItem.html', items=items, category=category, creator=creator)
 
-# check if url is an images
-class HeadRequest(urllib2.Request):
-    def get_method(self):
-        return 'HEAD'
+
 import logging
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
-def check_url(url):
-    response = urlopen(HeadRequest(url))
-    maintype = response.headers['Content-Type'].split(';')[0].lower()
-    logging.debug('here')
-    if maintype not in ('image/png', 'image/jpeg', 'image/jpg', 'image/gif'):
-        logging.debug("invalid type")
 
 def isURLImage(url):
     acceptable_image_types = ['image/png' , 'image/jpeg', 'image/jpg', 'image/svg+xml']
@@ -438,7 +435,8 @@ def newCategory():
             session.add(newCategory)
             session.commit()
         url_open.close()
-        return redirect(url_for('showCategory'))
+        logging.debug('here')
+        return redirect(url_for('showCategory', login_session=login_session))
     else:
         return render_template('newCategory.html', login_session=login_session)
 
@@ -460,7 +458,7 @@ def editCategory(category_id):
             if request.form['name']:
                 editedCategory.name = request.form['name']
                 flash('Category Successfully Edited %s' % editedCategory.name)
-                return redirect(url_for('showCategory'))
+                return redirect(url_for('showCategory'), login_session=login_session)
         else:
             return render_template('editCategory.html', category=editedCategory, login_session=login_session)
 

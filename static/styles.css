@@ -162,6 +162,10 @@ u }
 
 }
 
+img.category-image {
+	height: 175px;
+}
+
 form {
 	display: inline-block;;
 }
