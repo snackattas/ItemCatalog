@@ -15,6 +15,7 @@ import sqlalchemy.exc
 from sqlalchemy_imageattach.entity import Image, image_attachment
 from sqlalchemy_imageattach.context import store_context
 from sqlalchemy_imageattach.stores.fs import HttpExposedFileSystemStore
+import urllib2
 from urllib2 import urlopen
 
 app = Flask(__name__)
@@ -26,8 +27,8 @@ Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 
 store = HttpExposedFileSystemStore(
-    path='/var/local/ItemCatalog/images',
-    prefix='static/images/'
+    path='/vagrant/images/',
+    prefix='/static/images/'
 )
 # store = HttpExposedFileSystemStore(
 #     path='categoryimage',
@@ -49,31 +50,6 @@ def get_session():
         session.commit()
     except:
         redirect(url_for('pageNotFound', error=404))
-
-from sqlalchemy_imageattach.context import store_context
-def set_picture(pic, user_id):
-    try:
-        user = session.query(User).get(int(user_id))
-        with store_context(store):
-            #user.picture.from_file(request.files['picture'])
-            user.picture.from_file(pic)
-    except Exception:
-        session.rollback()
-        raise
-    session.commit()
-
-from urllib2 import urlopen
-def set_picture_url(request, user_id):
-    try:
-        user = session.query(User).get(int(user_id))
-        picture_url = request.values['picture_url']
-        with store_context(store):
-            user.picture.from_file(urlopen(picture_url))
-    except Exception:
-        session.rollback()
-        raise
-    session.commit()
-
 
 def createUser(login_session):
     user_id = getUserID(login_session)
@@ -417,23 +393,51 @@ def showPublicItem(category_id):
         creator = session.query(User).filter_by(id=category.user_id).one()
         return render_template('publicItem.html', items=items, category=category, creator=creator)
 
+# check if url is an images
+class HeadRequest(urllib2.Request):
+    def get_method(self):
+        return 'HEAD'
+import logging
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+def check_url(url):
+    response = urlopen(HeadRequest(url))
+    maintype = response.headers['Content-Type'].split(';')[0].lower()
+    logging.debug('here')
+    if maintype not in ('image/png', 'image/jpeg', 'image/jpg', 'image/gif'):
+        logging.debug("invalid type")
+
+def isURLImage(url):
+    acceptable_image_types = ['image/png' , 'image/jpeg', 'image/jpg', 'image/svg+xml']
+    try:
+        url_open = urllib2.urlopen(url)
+        url_info = url_open.info()
+        if url_info.type not in acceptable_image_types:
+            error = "Please enter an image URL"
+            url_open.close()
+            return ("", error)
+        return (url_open, "")
+    except Exception:
+        error = "Please enter a valid URL"
+        return ("", error)
+
+
 @app.route('/category/new/', methods=['GET', 'POST'])
 def newCategory():
     if 'username' not in login_session:
         return redirect(url_for('showPublicCategory'))
     if request.method == 'POST':
-        session= DBSession()
+        url = request.form['category_url']
+        (url_open, error) = isURLImage(url)
+        logging.debug('here')
+        if error:
+            return render_template('newCategory.html', login_session=login_session, error=error)
+        session = DBSession()
         newCategory = Category(name=request.form['name'], user_id=login_session['user_id'])
         with store_context(store):
-            if request.form.get('category_url'):
-                newCategory.picture.from_file(urlopen(request.form['category_url']))
-            if request.form.get('category_image'):
-                #newCategory.picture.from_file(open(request.form['category_image'], 'rb').read())
-                newCategory.picture.from_blob(open(request.files['category_image'], 'rb').read())
-                print newCategory.picture
+            newCategory.picture.from_file(url_open)
             session.add(newCategory)
-            print newCategory.picture
             session.commit()
+        url_open.close()
         return redirect(url_for('showCategory'))
     else:
         return render_template('newCategory.html', login_session=login_session)

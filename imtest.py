@@ -50,39 +50,42 @@ def set_picture(pic, user_id):
 import wand.image as image
 def test_add(user_id):
     with store_context(store):
-        user = session.query(User).get(int(user_id))
+        category = session.query(Category).get(int(user_id))
         img = '/vagrant/static/dog.jpg'
         #img = 'http://g-ecx.images-amazon.com/images/G/01/img15/pet-products/small-tiles/23695_pets_vertical_store_dogs_small_tile_8._CB312176604_.jpg'
 
         with open(img, 'rb') as f:
-            user.picture.from_file(f.read())
-            session.add(user)
+            print f
+            print dir(f)
+            print type(f)
+            category.picture.from_file(f)
+            session.add(category)
             session.commit()
 
 def addz(user_id):
     with store_context(store):
-        user = session.query(User).get(int(user_id))
-        img = '/Users/Zach/Desktop/back.jpg'
+        category = session.query(Category).get(int(user_id))
+        img = 'C:/Users/Zach/Desktop.jpg'
         #img = 'http://g-ecx.images-amazon.com/images/G/01/img15/pet-products/small-tiles/23695_pets_vertical_store_dogs_small_tile_8._CB312176604_.jpg'
 
         with open(img, 'rb') as f:
-            user.picture.from_file(f.read())
-            session.add(user)
+            print f
+            print dir(f)
+            category.picture.from_file(f)
+
+            session.add(category)
             session.commit()
 
 def recover():
-    users = session.query(User).all()
-    for user in users:
-        print "user ID: " + str(user.id)
-        print "name: " + user.name
-        print "email: " + user.email
-        print "facebook id: %s" % (user.facebook_id)
-        print "gplus id: %s" % (user.gplus_id)
-        print dir(user.picture)
+    Categories = session.query(Category).all()
+    for category in Categories:
+        print "user ID: " + str(category.id)
+        print "name: " + category.name
+        print dir(category.picture)
+        print category.picture
     imagey = session.query(CategoryImage).all()
     print len(imagey)
     for im in imagey:
-        print im.user_id
         print dir(im)
         print im.size
         print im.object_id
@@ -101,11 +104,11 @@ def addUser():
 
 def set_picture_url(user_id):
     try:
-        user = session.query(User).get(int(user_id))
+        category = session.query(Category).get(int(user_id))
         picture_url='http://g-ecx.images-amazon.com/images/G/01/img15/pet-products/small-tiles/23695_pets_vertical_store_dogs_small_tile_8._CB312176604_.jpg'
         with store_context(store):
-            user.picture.from_file(urlopen(picture_url))
-            session.add(user)
+            category.picture.from_file(urlopen(picture_url))
+            session.add(category)
             session.commit()
     except:
         raise

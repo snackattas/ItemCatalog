@@ -11,35 +11,22 @@
 	</div>
 	<div class="row">
 		<div class="col-md-6 col-md-offset-1 padding-top">
-			<form action="#" enctype="multipart/form-data" method="post">
+			<form action="#" method="post">
 				<div class="form-group">
-				<label for="name">Name:</label>
-				<input type ="text" class="form-control" maxlength="100" name="name">
-				<div class="padding-bottom"></div>
+					<label for="name">Name:</label>
+					<input type ="text" class="form-control" maxlength="100" name="name">
+					<label for="category_url">Image Url:</label>
+					<input type ="text" id="url" class="form-control" maxlength="500" name="category_url">
 				</div>
-				<label for="category_url">Image Url:</label>
-				<input type ="text" class="form-control" maxlength="500" name="category_image_url">
-				<input type="file" id="file-upload" accept=".png,.svg,.jpg,.jpeg" name="category_image">
-				<button type="reset" class="btn btn-default"id="cancel-all">Cancel</button>
-				<br><br>
+				<div class="padding-bottom"></div>
 				<button type="submit" class="btn btn-default" id="submit">
-				<span class="glyphicon glyphicon-cutlery" aria-hidden="true"></span>Create</button>
+					<span class="glyphicon glyphicon-cutlery" aria-hidden="true"></span>
+					Create
+				</button>
 			</form>
+			<div class="error">{{error}}</div>
 		</div>
 	</div>
+	<base href="">
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-	<script>
-	$('#file-upload').bind('fileuploadadd', function(e, data){
-		var jqXHR = data.submit(); // Catching the upload process of every file
-		$('#cancel-all').on('click', function(e) {
-					jqXHR.abort();
-		});
-	});
-	$('#file-upload').bind('fileuploadfail', function(e, data){
-    if (data.errorThrown === 'abort')
-    {
-      alert('File upload has been cancelled')
-    }
-		});
-	</script>
 {% endblock %}
