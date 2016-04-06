@@ -1,8 +1,10 @@
 {% extends "main.html" %}
 {% block content %}
-{% include "defaultHeader.html" %}
+{% include "loggedInHeader.html" %}
 	<div class="row top-menu">
 		<div class="col-md-10"></div>
+		<div class="col-md-2 text-right">
+					</div>
 	</div>
 	<div class="row divider blue">
 		<div class="col-md-12"></div>
@@ -22,15 +24,10 @@
           <li> <strong> {{ message }} </strong> </li>
       {% endfor %}
       </ul>
-      {% endif %}
+    {% endif %}
   {% endwith %}
 </div>
 
-<div class="row padding-top padding-bottom">
-	<div class="col-md-1"></div>
-	<div class="col-md-10 padding-none"></div>
-	<div class="col-md-1"></div>
-</div>
 <!-- <div class="recent-activity">
 Recent Activity
 <ul>
@@ -45,8 +42,19 @@ Recent Activity
 </ul>
 </div> -->
 
+	<div class="row padding-top padding-bottom">
+		<div class="col-md-1"></div>
+		<div class="col-md-10 padding-none">
+			<a href="{{url_for('newCategory')}}">
+				<button class="btn btn-default" id="new-restaurant">
+					<span class="glyphicon glyphicon-cutlery" aria-hidden="true"></span>Add Category
+				</button>
+			</a>
+		</div>
+		<div class="col-md-1"></div>
+	</div>
 {% for category in categories %}
-	<a href = "{{ url_for('showPublicItem', category_id = category.id) }}">
+	<a href = "{{url_for('showItem', category_id = category.id)}}">
 		<div class="row">
 			<div class="col-md-1"></div>
 				<div class="col-md-10 restaurant-list">
@@ -55,14 +63,13 @@ Recent Activity
 			<div class="col-md-1"></div>
 		</div>
 	</a>
-	<img class="image" src="{{category.picture.locate()}}">
+	<img class="category-image" src="{{category.picture.locate()}}">
 {% endfor %}
 {% if no_categories == True %}
-	<div class="row">
-		<div class="col-md-1"></div>
-			<div class="col-md-10">
-				<h3>No Categories Added yet</h3>
-			</div>
+	<div class="col-md-1"></div>
+		<div class="col-md-10">
+			<h3>No Categories Added Yet</h3>
+		</div>
 		<div class="col-md-1"></div>
 	</div>
 {% endif %}

@@ -28,6 +28,7 @@ h3 {
  	color: #7B7573;
  	line-height: 24px;
  	font-weight: 400;
+	word-wrap: break-word;
  }
 
  strong {
@@ -70,6 +71,12 @@ h3 {
 .btn.delete:hover {
 	border-color: #aaaaaa;
 	color: red;
+}
+.btn.cancel-category {
+	margin-left: -70px;
+}
+.btn.cancel-item {
+	margin-left: -100px;
 }
 .glyphicon {
 	margin-right: 10px;
@@ -162,8 +169,9 @@ u }
 
 }
 
-img.category-image {
-	height: 175px;
+img.image {
+	height: 225px;
+	width: 225px;
 }
 
 form {

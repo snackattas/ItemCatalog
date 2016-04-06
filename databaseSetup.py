@@ -1,30 +1,33 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, BigInteger, LargeBinary
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship
-from sqlalchemy import create_engine
-Base = declarative_base()
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
 import datetime
+
 from sqlalchemy_imageattach.entity import Image, image_attachment
 
-class User(Base):
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///itemCatalog.db'
+app.config[' SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+db = SQLAlchemy(app)
+
+class User(db.Model):
     __tablename__ = 'user'
 
-    id = Column(Integer, primary_key=True)
-    name = Column(String(80), nullable = False)
-    email = Column(String(80))
-    picture = Column(LargeBinary)
-    facebook_id = Column(String(80))
-    gplus_id = Column(String(80))
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(80), nullable = False)
+    email = db.Column(db.String(80))
+    picture = db.Column(db.LargeBinary)
+    facebook_id = db.Column(db.String(80))
+    gplus_id = db.Column(db.String(80))
 
-class Category(Base):
+class Category(db.Model):
     __tablename__ = 'category'
 
-    id = Column(Integer, primary_key=True)
-    name = Column(String(250), nullable=False)
-    user_id = Column(Integer, ForeignKey('user.id'))
-    user = relationship(User)
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(250), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user = db.relationship(User)
     picture = image_attachment('CategoryImage')
-    instant_of_creation = Column(DateTime(timezone=True), default=datetime.datetime.utcnow)
+    creation_instant = db.Column(db.DateTime(timezone=True), default=datetime.datetime.utcnow)
 
     @property
     def serialize(self):
@@ -34,18 +37,18 @@ class Category(Base):
            'id'                  : self.id,
        }
 
-class Item(Base):
+class Item(db.Model):
     __tablename__ = 'item'
 
-    id = Column(Integer, primary_key = True)
-    name = Column(String(80), nullable = False)
-    description = Column(String(250))
-    category_id = Column(Integer,ForeignKey('category.id'))
-    category = relationship(Category)
-    user_id = Column(Integer, ForeignKey('user.id'))
-    user = relationship(User)
+    id = db.Column(db.Integer, primary_key = True)
+    name =db.Column(db.String(80), nullable = False)
+    description = db.Column(db.String(250))
+    category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
+    category = db.relationship(Category)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user = db.relationship(User)
     picture = image_attachment('ItemImage')
-    instant_of_creation = Column(DateTime(timezone=True), default=datetime.datetime.utcnow)
+    creation_instant = db.Column(db.DateTime(timezone=True), default=datetime.datetime.utcnow)
 
     @property
     def serialize(self):
@@ -57,15 +60,28 @@ class Item(Base):
        }
 
 
-class CategoryImage(Base, Image):
+class CategoryImage(db.Model, Image):
     __tablename__ = 'categoryimage'
-    category_id = Column(Integer, ForeignKey('category.id'), primary_key=True)
-    category = relationship(Category)
+    category_id = db.Column(db.Integer, db.ForeignKey('category.id'), primary_key=True)
+    category = db.relationship(Category)
 
-class ItemImage(Base, Image):
+class ItemImage(db.Model, Image):
     __tablename__ = 'itemimage'
-    item_id = Column(Integer, ForeignKey('item.id'), primary_key=True)
-    item = relationship(Item)
+    item_id = db.Column(db.Integer, db.ForeignKey('item.id'), primary_key=True)
+    item = db.relationship(Item)
 
-engine = create_engine('sqlite:///itemCatalog.db')
-Base.metadata.create_all(engine)
+class ChangeLog(db.Model):
+    __tablename__ = 'changelog'
+    id = db.Column(db.Integer, primary_key = True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user = db.relationship(User)
+    old_category_name = db.Column(db.String(80))
+    new_category_name = db.Column(db.String(80))
+    old_item_name = db.Column(db.String(80))
+    new_item_name = db.Column(db.String(80))
+    update_instant = db.Column(db.DateTime(timezone=True), default=datetime.datetime.utcnow)
+    action = db.Column(db.String(6))
+    table = db.Column(db.String(9))
+
+
+db.create_all()
