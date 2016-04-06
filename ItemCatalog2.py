@@ -415,7 +415,16 @@ def newCategory():
         url = request.form['url']
         (url, error) = isURLImage(url)
         if error:
-            return render_template('newCategory.html', login_session=login_session, error=error)
+            return render_template('newCategory.html',
+                                   login_session=login_session,
+                                   error=error)
+        try:
+            url_open = urlopen(url)
+        except:
+            error = "Unable to make requests to this URL: \n %s" % (url)
+            return render_template('newCategory.html',
+                                   login_session=login_session,
+                                   error=error)
         change_log = ChangeLog(
             user_id=login_session['user_id'],
             new_category_name = request.form['name'],
@@ -425,13 +434,6 @@ def newCategory():
         new_category = Category(
             name=request.form['name'],
             user_id=login_session['user_id'])
-        try:
-            url_open = urlopen(url)
-        except:
-            error = "This website is blocked from making requests to this URL: \n %s" % (url)
-            return render_template('newCategory.html',
-                                   login_session=login_session,
-                                   error=error)
         with store_context(store):
             new_category.picture.from_file(url_open)
             session.add(new_category)
@@ -450,6 +452,21 @@ def newCategory():
 def editCategory(category_id):
     edited_category = Category.query.filter_by(id=category_id).one()
     if request.method == 'POST':
+        url = request.form['url']
+        (url, error) = isURLImage(url)
+        if error:
+            return render_template('editCategory.html',
+                                   login_session=login_session,
+                                   category=edited_category,
+                                   error=error)
+        try:
+            url_open = urlopen(url)
+        except:
+            error = "Unable to make requests to this URL: \n %s" % (url)
+            return render_template('editCategory.html',
+                                   login_session=login_session,
+                                   category=edited_category,
+                                   error=error)
         change_log = ChangeLog(
             user_id=edited_category.user_id,
             old_category_name = edited_category.name,
@@ -457,15 +474,19 @@ def editCategory(category_id):
             update_instant = datetime.datetime.utcnow(),
             action="update",
             table="category")
-        edited_category.name = request.form['name']
-        session.add(change_log)
-        session.add(edited_category)
-        flash('Category Successfully Edited %s' % edited_category.name)
         with store_context(store):
+            edited_category.picture.from_file(url_open)
+            edited_category.name = request.form['name']
+            session.add(change_log)
+            session.add(edited_category)
+            flash('Category Successfully Edited %s' % edited_category.name)
             session.commit()
+            url_open.close()
         return redirect(url_for('showCategory'))
     else:
-        return render_template('editCategory.html', category=edited_category, login_session=login_session)
+        return render_template('editCategory.html',
+                               category=edited_category,
+                               login_session=login_session)
 
 # Delete a category
 @app.route('/category/<int:category_id>/delete/', methods=['GET', 'POST'])
@@ -508,8 +529,18 @@ def newItem(category_id):
         url = request.form['url']
         (url, error) = isURLImage(url)
         if error:
-            print 'beforefirst'
-            return render_template('newItem.html', login_session=login_session, category=category, error=error)
+            return render_template('newItem.html',
+                                   login_session=login_session,
+                                   category=category,
+                                   error=error)
+        try:
+            url_open = urlopen(url)
+        except:
+            error = "Unable to make requests to this URL: \n %s" % (url)
+            return render_template('newItem.html',
+                                   login_session=login_session,
+                                   category=category,
+                                   error=error)
         change_log = ChangeLog(
             user_id=category.user_id,
             new_item_name = request.form['name'],
@@ -521,16 +552,6 @@ def newItem(category_id):
             description=request.form['description'],
             category_id=category_id,
             user_id=category.user_id)
-        print 'first'
-        try:
-            url_open = urlopen(url)
-        except:
-            error = "This website is blocked from making requests to this URL: \n %s" % (url)
-            return render_template('newItem.html',
-                                   login_session=login_session,
-                                   category=category,
-                                   error=error)
-        print 'second'
         with store_context(store):
             new_item.picture.from_file(url_open)
             session.add(new_item)
@@ -538,7 +559,6 @@ def newItem(category_id):
             flash('New Item %s Successfully Created' % (new_item.name))
             session.commit()
             url_open.close()
-        print 'third'
         return redirect(url_for('showItem', category_id=category_id))
     else:
         return render_template('newItem.html', category=category, login_session=login_session)
@@ -549,9 +569,30 @@ def newItem(category_id):
     methods=['GET', 'POST'])
 @requires_creator
 def editItem(category_id, item_id):
+    category = Category.query.filter_by(id=category_id).one()
     edited_item = Item.query.filter_by(id=item_id, category_id=category_id).one()
     if request.method == 'POST':
         # The ChangeLog for editing items will have an entry for any change made to an item, but the entry only captures name changes.  Too much effort to load in if it's a description change or an image change
+        url = request.form['url']
+        (url, error) = isURLImage(url)
+        if error:
+            return render_template('editItem.html',
+                                   login_session=login_session,
+                                   category_id=category_id,
+                                   item_id=item_id,
+                                   item=edited_item,
+                                   error=error)
+        try:
+            url_open = urlopen(url)
+        except:
+            error = "Unable to make requests to this URL: \n %s" % (url)
+            print url
+            return render_template('editItem.html',
+                                   login_session=login_session,
+                                   category_id=category_id,
+                                   item_id=item_id,
+                                   item=edited_item,
+                                   error=error)
         change_log = ChangeLog(
             user_id=edited_item.user_id,
             old_item_name=edited_item.name,
@@ -559,12 +600,14 @@ def editItem(category_id, item_id):
             update_instant = datetime.datetime.utcnow(),
             action="update",
             table="item")
-
-        edited_item.name = request.form['name']
-        edited_item.description = request.form['description']
-        session.add(change_log)
-        flash('Item %s Successfully Edited' % (edited_item.name))
-        session.commit()
+        with store_context(store):
+            edited_item.name = request.form['name']
+            edited_item.description = request.form['description']
+            edited_item.picture.from_file(url_open)
+            session.add(change_log)
+            flash('Item %s Successfully Edited' % (edited_item.name))
+            session.commit()
+            url_open.close()
         return redirect(url_for('showItem', category_id=category_id))
     else:
         return render_template('editItem.html', category_id=category_id, item_id=item_id, item=edited_item, login_session=login_session)
