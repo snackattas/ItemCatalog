@@ -1,7 +1,10 @@
 {% extends "main.html" %}
 {% block content %}
-{% include "defaultHeader.html" %}
-
+{% if login_session.get("user_id") %}
+	{% include "loggedInHeader.html" %}
+{% else %}
+	{% include "defaultHeader.html" %}
+{% endif %}
 	<div class="row divider green">
 		<div class="col-md-12"></div>
 	</div>

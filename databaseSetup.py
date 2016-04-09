@@ -27,36 +27,42 @@ class Category(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     user = db.relationship(User)
     picture = image_attachment('CategoryImage')
+    picture_url = db.Column(db.String(500))
     creation_instant = db.Column(db.DateTime(timezone=True), default=datetime.datetime.utcnow)
 
     @property
     def serialize(self):
        """Return object data in easily serializeable format"""
        return {
-           'name'                : self.name,
-           'id'                  : self.id,
+            'name'                : self.name,
+            'id'                  : self.id,
+            'picture_url'         : self.picture_url,
+            'creation_instant'    : self.creation_instant
        }
 
 class Item(db.Model):
     __tablename__ = 'item'
 
     id = db.Column(db.Integer, primary_key = True)
-    name =db.Column(db.String(80), nullable = False)
+    name = db.Column(db.String(80), nullable = False)
     description = db.Column(db.String(250))
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
     category = db.relationship(Category)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     user = db.relationship(User)
     picture = image_attachment('ItemImage')
+    picture_url = db.Column(db.String(500))
     creation_instant = db.Column(db.DateTime(timezone=True), default=datetime.datetime.utcnow)
 
     @property
     def serialize(self):
        """Return object data in easily serializeable format"""
        return {
-           'name'                : self.name,
-           'description'         : self.description,
-           'id'                  : self.id,
+            'name'                : self.name,
+            'description'         : self.description,
+            'id'                  : self.id,
+            'picture_url'         : self.picture_url,
+            'creation_instant'    : self.creation_instant
        }
 
 
@@ -75,10 +81,12 @@ class ChangeLog(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     user = db.relationship(User)
-    old_category_name = db.Column(db.String(80))
-    new_category_name = db.Column(db.String(80))
-    old_item_name = db.Column(db.String(80))
-    new_item_name = db.Column(db.String(80))
+    category_name = db.Column(db.String(80))
+    category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
+    category = db.relationship(Category)
+    item_name = db.Column(db.String(80))
+    item_id = db.Column(db.Integer, db.ForeignKey('item.id'))
+    item = db.relationship(Item)
     update_instant = db.Column(db.DateTime(timezone=True), default=datetime.datetime.utcnow)
     action = db.Column(db.String(6))
     table = db.Column(db.String(9))

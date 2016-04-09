@@ -71,8 +71,8 @@ def isURLImage(url):
     acceptable_image_types = ['image/png' , 'image/jpeg', 'image/jpg', 'image/svg+xml']
     scheme, host, path, params, query, fragment = urlparse.urlparse(url)
     if scheme != "http":
-        error = "Only supports HTTP requests"
-        return ("",error)
+        error = "Only supports HTTP requests: %s" % (url)
+        return ("", error)
     if not path:
         path = "/"
     if params:
@@ -90,17 +90,17 @@ def isURLImage(url):
     # Convert byte size to megabytes
     image_type = headers.get("content-type")
     if image_type not in acceptable_image_types:
-        error = "Please enter an image URL: \n %s" % (url)
+        error = "Only image URLs accepted: %s" % (url)
         h.close()
         return ("", error)
     size = headers.get("content-length")
     if not size:
-        error = "Can't determine size of image from HTTP request: \n %s" % (url)
+        error = "Can't determine size of image from HTTP request: %s" % (url)
         h.close()
         return ("", error)
     size = float(size) / 1000000.0
     if size > 3.0:
-        error = "Only supports images that are less than 3 MB: \n %s" % (url)
+        error = "Only supports images that are less than 3 MB: %s" % (url)
         h.close()
         return ("", error)
     h.close()
@@ -352,7 +352,7 @@ def categoryItemJSON(category_id):
 
 
 @app.route('/category/<int:category_id>/item/<int:item_id>/JSON/')
-def itemJSON(category_id, item_id):
+def individualItemJSON(category_id, item_id):
     item = Item.query.filter_by(id=item_id).one()
     return jsonify(item=item.serialize)
 
@@ -362,8 +362,60 @@ def categoryJSON():
     categories = Category.query.all()
     return jsonify(categories=[category.serialize for category in categories])
 
+from urlparse import urljoin
+from flask import request
+from werkzeug.contrib.atom import AtomFeed
+def make_external(url):
+    return urljoin(request.url_root, url)
+
+
+@app.route('/category.atom')
+def categoryATOM():
+    latest_update = Category.query.order_by(db.desc('creation_instant')).limit(1)
+    feed = AtomFeed('All Categories',
+                    feed_url=request.url, url=request.url_root, author={'name':'Zach Attas', 'email':'zach.attas@gmail.com'},
+                    id="http://localhost:8000/publicCategory/",
+                    updated=latest_update[0].creation_instant)
+    categories = Category.query.order_by(db.desc('creation_instant')).all()
+    for category in categories:
+        user = User.query.filter_by(id=category.user_id).one()
+        feed.add(category.name,
+                 "picture url: <a href='%s'>%s</a>" % (category.picture_url, category.picture_url),
+                 content_type='html',
+                 author={'name':user.name},
+                 url="http://localhost:8000/publicCategory/#%s" % (category.id),
+                 id="http://localhost:8000/publicCategory/#%s" % (category.id),
+                 updated=category.creation_instant,
+                 published=category.creation_instant)
+    return feed.get_response()
+
+from feedgen.feed import FeedGenerator
+import pytz
+@app.route('/category0.atom')
+def category0ATOM():
+    fg = FeedGenerator()
+    fg.id('http://localhost:8000/category.atom')
+    fg.title('All Categories')
+    fg.author({'name': 'Zach Attas', 'email':'zach.attas@gmail.com'})
+    fg.link(href='http://localhost:8000/publicCategory', rel='alternate')
+    fg.subtitle('List of all categories committed to the database')
+    fg.language('en')
+    categories = Category.query.order_by(db.desc('creation_instant')).all()
+    for category in categories:
+        user = User.query.filter_by(id=category.user_id).one()
+        fe = fg.add_entry()
+        fe.id('http://localhost:8000/publicCategory/#%s' % (category.id))
+        fe.content("picture url: <a href='%s'>%s</a>" % (category.picture_url, category.picture_url))
+        fg.link(href='http://localhost:8000/publicCategory/#%s' % (category.id), rel='alternate')
+        fe.title(category.name)
+        fe.author({'name': user.name})
+        fe.updated(category.creation_instant.replace(tzinfo=pytz.UTC))
+    atomfeed = fg.atom_str(pretty=True)
+    return render_template('category0.atom', atomfeed=atomfeed)
+
 def latestAdditions():
-    return ['a','b']
+    latest_additions = ChangeLog.query.order_by(db.desc('update_instant')).limit(10)
+    return latest_additions
 
 # Show all restaurants
 
@@ -378,7 +430,7 @@ def showPublicCategory():
     except:
         no_categories = True
     with store_context(store):
-        return render_template('publicCategory.html', categories=categories, no_categories=no_categories)
+        return render_template('publicCategory.html', categories=categories, no_categories=no_categories, latest_additions=latestAdditions())
     # return render_template('publicCategory.html', categories=categories, no_categories=no_categories, latest_additions=latestAdditions())
 
 
@@ -390,7 +442,9 @@ def showPublicItem(category_id):
         category_id=category.id).all()
     creator = User.query.filter_by(id=category.user_id).one()
     with store_context(store):
-        return render_template('publicItem.html', items=items, category=category, creator=creator)
+        print login_session
+        print login_session.get("user_id")
+        return render_template('publicItem.html', items=items, category=category, creator=creator, login_session=login_session)
 
 
 @app.route('/category/')
@@ -403,7 +457,7 @@ def showCategory():
     except:
         no_categories = True
     with store_context(store):
-        return render_template('category.html', categories=categories, login_session=login_session, no_categories=no_categories)
+        return render_template('category.html', categories=categories, login_session=login_session, no_categories=no_categories, latest_additions=latestAdditions())
     # return render_template('category.html', categories=categories, login_session=login_session, no_categories=no_categories, latest_additions=latestAdditions())
 
 
@@ -421,26 +475,30 @@ def newCategory():
         try:
             url_open = urlopen(url)
         except:
-            error = "Unable to make requests to this URL: \n %s" % (url)
+            error = "Unable to make requests to this URL: %s" % (url)
             return render_template('newCategory.html',
                                    login_session=login_session,
                                    error=error)
-        change_log = ChangeLog(
-            user_id=login_session['user_id'],
-            new_category_name = request.form['name'],
-            update_instant = datetime.datetime.utcnow(),
-            action="new",
-            table="category")
         new_category = Category(
             name=request.form['name'],
-            user_id=login_session['user_id'])
+            user_id=login_session['user_id'],
+            picture_url=url)
         with store_context(store):
             new_category.picture.from_file(url_open)
             session.add(new_category)
-            session.add(change_log)
             flash('New Category %s Successfully Created' % (new_category.name))
             session.commit()
             url_open.close()
+        newest_category = Category.query.filter_by(user_id=login_session['user_id']).order_by(db.desc('creation_instant')).limit(1)
+        change_log = ChangeLog(
+            user_id=newest_category[0].user_id,
+            category_name = newest_category[0].name,
+            category_id = newest_category[0].id,
+            update_instant = newest_category[0].creation_instant,
+            action="new",
+            table="category")
+        session.add(change_log)
+        session.commit()
         return redirect(url_for('showCategory'))
     else:
         return render_template('newCategory.html', login_session=login_session)
@@ -462,21 +520,22 @@ def editCategory(category_id):
         try:
             url_open = urlopen(url)
         except:
-            error = "Unable to make requests to this URL: \n %s" % (url)
+            error = "Unable to make requests to this URL: %s" % (url)
             return render_template('editCategory.html',
                                    login_session=login_session,
                                    category=edited_category,
                                    error=error)
         change_log = ChangeLog(
             user_id=edited_category.user_id,
-            old_category_name = edited_category.name,
-            new_category_name = request.form['name'],
+            category_name = request.form['name'],
+            category_id=category_id,
             update_instant = datetime.datetime.utcnow(),
             action="update",
             table="category")
         with store_context(store):
             edited_category.picture.from_file(url_open)
             edited_category.name = request.form['name']
+            edited_category.picture_url = url
             session.add(change_log)
             session.add(edited_category)
             flash('Category Successfully Edited %s' % edited_category.name)
@@ -496,7 +555,7 @@ def deleteCategory(category_id):
     if request.method == 'POST':
         change_log = ChangeLog(
             user_id=category_to_delete.user_id,
-            old_category_name = category_to_delete.name,
+            category_name = category_to_delete.name,
             update_instant = datetime.datetime.utcnow(),
             action="delete",
             table="category")
@@ -536,32 +595,40 @@ def newItem(category_id):
         try:
             url_open = urlopen(url)
         except:
-            error = "Unable to make requests to this URL: \n %s" % (url)
+            error = "Unable to make requests to this URL: %s" % (url)
             return render_template('newItem.html',
                                    login_session=login_session,
                                    category=category,
                                    error=error)
-        change_log = ChangeLog(
-            user_id=category.user_id,
-            new_item_name = request.form['name'],
-            update_instant = datetime.datetime.utcnow(),
-            action="new",
-            table="item")
         new_item = Item(
             name=request.form['name'],
             description=request.form['description'],
             category_id=category_id,
-            user_id=category.user_id)
+            user_id=category.user_id,
+            picture_url=url)
         with store_context(store):
             new_item.picture.from_file(url_open)
             session.add(new_item)
-            session.add(change_log)
             flash('New Item %s Successfully Created' % (new_item.name))
             session.commit()
             url_open.close()
+        newest_item = Item.query.filter_by(user_id=category.user_id).order_by(db.desc('creation_instant')).limit(1)
+        change_log = ChangeLog(
+            user_id = category.user_id,
+            category_name=category.name,
+            category_id=category_id,
+            item_name = newest_item[0].name,
+            item_id = newest_item[0].id,
+            update_instant = newest_item[0].creation_instant,
+            action= "new",
+            table = "item")
+        session.add(change_log)
+        session.commit()
         return redirect(url_for('showItem', category_id=category_id))
     else:
-        return render_template('newItem.html', category=category, login_session=login_session)
+        return render_template('newItem.html',
+                               category=category,
+                               login_session=login_session)
 
 # Edit a menu item
 @app.route(
@@ -585,8 +652,7 @@ def editItem(category_id, item_id):
         try:
             url_open = urlopen(url)
         except:
-            error = "Unable to make requests to this URL: \n %s" % (url)
-            print url
+            error = "Unable to make requests to this URL: %s" % (url)
             return render_template('editItem.html',
                                    login_session=login_session,
                                    category_id=category_id,
@@ -595,8 +661,10 @@ def editItem(category_id, item_id):
                                    error=error)
         change_log = ChangeLog(
             user_id=edited_item.user_id,
-            old_item_name=edited_item.name,
-            new_item_name = request.form['name'],
+            category_name=category.name,
+            category_id=category_id,
+            item_name = request.form['name'],
+            item_id=item_id,
             update_instant = datetime.datetime.utcnow(),
             action="update",
             table="item")
@@ -604,13 +672,18 @@ def editItem(category_id, item_id):
             edited_item.name = request.form['name']
             edited_item.description = request.form['description']
             edited_item.picture.from_file(url_open)
+            edited_item.picture_url = url
             session.add(change_log)
             flash('Item %s Successfully Edited' % (edited_item.name))
             session.commit()
             url_open.close()
         return redirect(url_for('showItem', category_id=category_id))
     else:
-        return render_template('editItem.html', category_id=category_id, item_id=item_id, item=edited_item, login_session=login_session)
+        return render_template('editItem.html',
+                               category_id=category_id,
+                               item_id=item_id,
+                               item=edited_item,
+                               login_session=login_session)
 
 # Delete a menu item
 @app.route(
@@ -618,11 +691,14 @@ def editItem(category_id, item_id):
     methods=['GET', 'POST'])
 @requires_creator
 def deleteItem(category_id, item_id):
+    category = Category.query.filter_by(id=category_id).one()
     item_to_delete = Item.query.filter_by(id=item_id, category_id=category_id).one()
     if request.method == 'POST':
         change_log = ChangeLog(
             user_id=item_to_delete.user_id,
-            old_item_name = item_to_delete.name,
+            category_name=category.name,
+            category_id=category_id,
+            item_name = item_to_delete.name,
             update_instant = datetime.datetime.utcnow(),
             action="delete",
             table="item")
