@@ -29,7 +29,7 @@
 <div class="recent-activity">
 Recent Activity
 <ul>
-{% for either in latest_additions %}
+{% for either in changes %}
 	{% if either.table == 'category' %}
 		{% if either.action == 'new' %}
 			<li>Category <a href="{{ url_for('showPublicCategory', _anchor=either.category_id) }}"><i>{{either.category_name}}</i></a> added at {{moment(either.update_instant).format("h:mm:ssa MMM D")}}</li>

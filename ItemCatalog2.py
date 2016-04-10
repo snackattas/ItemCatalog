@@ -1,7 +1,5 @@
 from flask import Flask, render_template, request, redirect, jsonify, url_for, flash, make_response
 from flask import session as login_session
-#from sqlalchemy import create_engine, asc, desc, union, null, literal_column, ForeignKey
-#from sqlalchemy.orm import sessionmaker
 from databaseSetup import User, Category, Item, CategoryImage, ItemImage, ChangeLog
 from databaseSetup import app, db
 
@@ -369,53 +367,165 @@ def make_external(url):
     return urljoin(request.url_root, url)
 
 
-@app.route('/category.atom')
+@app.route('/category.atom/')
 def categoryATOM():
     latest_update = Category.query.order_by(db.desc('creation_instant')).limit(1)
-    feed = AtomFeed('All Categories',
-                    feed_url=request.url, url=request.url_root, author={'name':'Zach Attas', 'email':'zach.attas@gmail.com'},
-                    id="http://localhost:8000/publicCategory/",
-                    updated=latest_update[0].creation_instant)
+    feed = AtomFeed(
+        'All Categories',
+        feed_url=request.url,
+        url=request.url_root,
+        author={'name':'Zach Attas', 'email':'zach.attas@gmail.com'},
+        id="http://localhost:8000/publicCategory/",
+        updated=latest_update[0].creation_instant)
     categories = Category.query.order_by(db.desc('creation_instant')).all()
     for category in categories:
         user = User.query.filter_by(id=category.user_id).one()
-        feed.add(category.name,
-                 "picture url: <a href='%s'>%s</a>" % (category.picture_url, category.picture_url),
-                 content_type='html',
-                 author={'name':user.name},
-                 url="http://localhost:8000/publicCategory/#%s" % (category.id),
-                 id="http://localhost:8000/publicCategory/#%s" % (category.id),
-                 updated=category.creation_instant,
-                 published=category.creation_instant)
+        url = "http://localhost:8000/publicCategory/#%s" % (category.id)
+        content = "Picture URL: <a href='%s'>%s</a>" % (category.picture_url, category.picture_url)
+        feed.add(
+            category.name,
+            content,
+            content_type='html',
+            author={'name':user.name},
+            url=url,
+            id=url,
+            updated=category.creation_instant,
+            published=category.creation_instant)
     return feed.get_response()
 
-from feedgen.feed import FeedGenerator
-import pytz
-@app.route('/category0.atom')
-def category0ATOM():
-    fg = FeedGenerator()
-    fg.id('http://localhost:8000/category.atom')
-    fg.title('All Categories')
-    fg.author({'name': 'Zach Attas', 'email':'zach.attas@gmail.com'})
-    fg.link(href='http://localhost:8000/publicCategory', rel='alternate')
-    fg.subtitle('List of all categories committed to the database')
-    fg.language('en')
-    categories = Category.query.order_by(db.desc('creation_instant')).all()
-    for category in categories:
-        user = User.query.filter_by(id=category.user_id).one()
-        fe = fg.add_entry()
-        fe.id('http://localhost:8000/publicCategory/#%s' % (category.id))
-        fe.content("picture url: <a href='%s'>%s</a>" % (category.picture_url, category.picture_url))
-        fg.link(href='http://localhost:8000/publicCategory/#%s' % (category.id), rel='alternate')
-        fe.title(category.name)
-        fe.author({'name': user.name})
-        fe.updated(category.creation_instant.replace(tzinfo=pytz.UTC))
-    atomfeed = fg.atom_str(pretty=True)
-    return render_template('category0.atom', atomfeed=atomfeed)
+@app.route('/item.atom/')
+def itemATOM():
+    latest_update = Item.query.order_by(db.desc('creation_instant')).limit(1)
+    feed = AtomFeed(
+        'All Items',
+        feed_url=request.url,
+        url=request.url_root,
+        author={'name':'Zach Attas', 'email':'zach.attas@gmail.com'},
+        id="http://localhost:8000/publicCategory/",
+        updated=latest_update[0].creation_instant)
+    items = Item.query.order_by(db.desc('creation_instant')).all()
+    for item in items:
+        category = Category.query.filter_by(id=item.category_id).one()
+        user = User.query.filter_by(id=item.user_id).one()
+        content = """
+            Description: %s
+            </br>
+            Category: <a href='http://localhost:8000/publicCategory/#%s'>%s</a>
+            </br>
+            Picture URL: <a href='%s'>%s</a>""" % (item.description, category.id, category.name, item.picture_url, item.picture_url)
+        url = "http://localhost:8000/publicCategory/%s/publicItem/#%s" % (category.id, item.id)
+        feed.add(
+            item.name,
+            content,
+            content_type='html',
+            author={'name':user.name},
+            url=url,
+            id=url,
+            updated=item.creation_instant,
+            published=item.creation_instant)
+    return feed.get_response()
 
-def latestAdditions():
-    latest_additions = ChangeLog.query.order_by(db.desc('update_instant')).limit(10)
-    return latest_additions
+@app.route('/all.atom/')
+def allATOM():
+    results = db.engine.execute("""
+        SELECT * FROM
+            (SELECT
+                id,
+                name,
+                user_id,
+                NULL as description,
+                creation_instant,
+                picture_url,
+                NULL as category_id,
+                "category" AS type
+            FROM Category
+            UNION
+            SELECT
+                id,
+                name,
+                user_id,
+                description,
+                creation_instant,
+                picture_url,
+                category_id,
+                "item" AS type
+            FROM Item)
+        ORDER BY creation_instant DESC""").fetchall()
+    last_updated = datetime.datetime.strptime(results[0].creation_instant,'%Y-%m-%d %H:%M:%S.%f')
+    feed = AtomFeed(
+        'All Categories and Items',
+        feed_url=request.url,
+        url=request.url_root,
+        author={'name':'Zach Attas', 'email':'zach.attas@gmail.com'},
+        id="http://localhost:8000/publicCategory/",
+        updated=last_updated)
+    for result in results:
+        user = User.query.filter_by(id=result.user_id).one()
+        last_updated = datetime.datetime.strptime(result.creation_instant,'%Y-%m-%d %H:%M:%S.%f')
+        if result.type == 'category':
+            url = "http://localhost:8000/publicCategory/#%s" % (result.id)
+            content = "Picture URL: <a href='%s'>%s</a>" % (result.picture_url, result.picture_url)
+            name = "Category %s" % (result.name)
+        if result.type == 'item':
+            category = Category.query.filter_by(id=result.category_id).one()
+            content = """
+                Description: %s
+                </br>
+                Category: <a href='http://localhost:8000/publicCategory/#%s'>%s</a>
+                </br>
+                Picture URL: <a href='%s'>%s</a>""" % (result.description, result.id, category.name, result.picture_url, result.picture_url)
+            url = "http://localhost:8000/publicCategory/%s/publicItem/#%s" % (category.id, result.id)
+            name = "Item %s" % (result.name)
+        feed.add(
+            name,
+            content,
+            content_type='html',
+            author={'name':user.name},
+            url=url,
+            id=url,
+            updated=last_updated,
+            published=last_updated)
+    return feed.get_response()
+
+@app.route('/changes.atom/')
+def changesATOM():
+    changes = ChangeLog.query.order_by(db.desc('update_instant'))
+    feed = AtomFeed(
+        'Changes to Category Database',
+        feed_url=request.url,
+        url=request.url_root,
+        author={'name':'Zach Attas', 'email':'zach.attas@gmail.com'},
+        id="http://localhost:8000/publicCategory/",
+        updated=changes[0].update_instant)
+    for change in changes:
+        user = User.query.filter_by(id=change.user_id).one()
+        content = "Action: %s" % (change.action)
+        if change.table == 'category':
+            name = "Category %s" % (change.category_name)
+            url = None
+            uri = "http://localhost:8000/publicCategory/"
+            if change.action == 'new' or change.action == 'update':
+                url = "http://localhost:8000/publicCategory/#%s" % (change.category_id)
+                uri = url
+        if change.table == 'item':
+            name = "Item %s" % (change.item_name)
+            if change.action == 'new' or change.action == 'update':
+                url = "http://localhost:8000/publicCategory/%s/publicItem/#%s" % (change.category_id, change.item_id)
+                uri = url
+        feed.add(
+            name,
+            content,
+            content_type='html',
+            author={'name':user.name},
+            url=url,
+            id=uri,
+            updated=change.update_instant,
+            published=change.update_instant)
+    return feed.get_response()
+
+def changes():
+    changes = ChangeLog.query.order_by(db.desc('update_instant')).limit(10)
+    return changes
 
 # Show all restaurants
 
@@ -430,7 +540,7 @@ def showPublicCategory():
     except:
         no_categories = True
     with store_context(store):
-        return render_template('publicCategory.html', categories=categories, no_categories=no_categories, latest_additions=latestAdditions())
+        return render_template('publicCategory.html', categories=categories, no_categories=no_categories, changes=changes())
     # return render_template('publicCategory.html', categories=categories, no_categories=no_categories, latest_additions=latestAdditions())
 
 
@@ -457,7 +567,7 @@ def showCategory():
     except:
         no_categories = True
     with store_context(store):
-        return render_template('category.html', categories=categories, login_session=login_session, no_categories=no_categories, latest_additions=latestAdditions())
+        return render_template('category.html', categories=categories, login_session=login_session, no_categories=no_categories, changes=changes())
     # return render_template('category.html', categories=categories, login_session=login_session, no_categories=no_categories, latest_additions=latestAdditions())
 
 
