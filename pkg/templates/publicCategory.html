@@ -1,0 +1,87 @@
+{% extends "main.html" %}
+{% block content %}
+{% include "defaultHeader.html" %}
+	<div class="row top-menu">
+		<div class="col-md-10"></div>
+	</div>
+	<div class="row divider blue">
+		<div class="col-md-12"></div>
+	</div>
+	<div class="row banner main">
+		<div class="col-md-1"></div>
+		<div class="col-md-11 padding-none">
+			<h1>Categories</h1>
+		</div>
+	</div>
+
+<div class = 'flash'>
+	{% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <ul>
+      {% for message in messages %}
+          <li> <strong> {{ message }} </strong> </li>
+      {% endfor %}
+      </ul>
+      {% endif %}
+  {% endwith %}
+</div>
+
+{% if changes != [] %}
+<div class="recent-activity">
+Recent Activity
+<ul>
+{% for either in changes %}
+	{% if either.table == 'category' %}
+		{% if either.action == 'new' %}
+			<li>Category <a href="{{ url_for('showPublicCategory', _anchor=either.category_id) }}"><i>{{either.category_name}}</i></a> added at {{moment(either.update_instant).format("h:mm:ssa MMM D")}}</li>
+		{% endif %}
+		{% if either.action == 'update' %}
+			<li>Category <a href="{{ url_for('showPublicCategory', _anchor=either.category_id) }}"><i>{{either.category_name}}</i></a> updated at {{moment(either.update_instant).format("h:mm:ssa MMM D")}}</li>
+		{% endif %}
+		{% if either.action == 'delete' %}
+			<li>Category <i>{{either.category_name}}</i></a> deleted at {{moment(either.update_instant).format("h:mm:ssa MMM D")}}</li>
+		{% endif %}
+	{% endif %}
+	{% if either.table == 'item' %}
+		{% if either.action == 'new' %}
+			<li>Item <a href="{{ url_for('showPublicItem', category_id=either.category_id, _anchor=either.item_id) }}"><i>{{either.item_name}}</i></a> added to Category <a href="{{ url_for('showPublicCategory', _anchor=either.category_id) }}"><i>{{either.category_name}}</i></a > at {{moment(either.update_instant).format("h:mm:ssa MMM D")}}</li>
+		{% endif %}
+		{% if either.action == 'update' %}
+			<li>Item <a href="{{ url_for('showPublicItem', category_id=either.category_id, _anchor=either.item_id) }}"><i>{{either.item_name}}</i></a> updated in Category <a href="{{ url_for('showPublicCategory', _anchor=either.category_id) }}"><i>{{either.category_name}}</i></a >at {{moment(either.update_instant).format("h:mm:ssa MMM D")}}</li>
+		{% endif %}
+		{% if either.action == 'delete' %}
+			<li>Item <i>{{either.item_name}}</i></a> deleted from Category <a href="{{ url_for('showPublicCategory', _anchor=either.category_id) }}"><i>{{either.category_name}}</i></a > at {{moment(either.update_instant).format("h:mm:ssa MMM D")}}</li>
+		{% endif %}
+	{% endif %}
+{% endfor %}
+</div>
+{% endif %}
+
+<div class="row padding-top padding-bottom">
+	<div class="col-md-1"></div>
+	<div class="col-md-10 padding-none"></div>
+	<div class="col-md-1"></div>
+</div>
+
+{% for category in categories %}
+	<a href = "{{ url_for('showPublicItem', category_id = category.id) }}">
+		<div class="row">
+			<div class="col-md-1"></div>
+				<div class="col-md-10 restaurant-list" id={{category.id}}>
+					<h3>{{category.name}}</h3>
+				</div>
+			<div class="col-md-1"></div>
+		</div>
+	</a>
+	<img class="image" src="{{category.picture.locate()}}">
+{% endfor %}
+{% if categories == [] %}
+	<div class="row">
+		<div class="col-md-1"></div>
+			<div class="col-md-10">
+				<h3>No Categories Added yet</h3>
+			</div>
+		<div class="col-md-1"></div>
+	</div>
+{% endif %}
+{% endblock %}
