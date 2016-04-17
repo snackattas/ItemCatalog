@@ -1,6 +1,5 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from flask_moment import Moment
 
 app = Flask(__name__)
 
@@ -9,7 +8,6 @@ app.config[' SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Initialize third party modules
 db = SQLAlchemy(app)
-moment = Moment(app)
 
 # Create global session for Flask-SQLAlchemy
 session = db.session

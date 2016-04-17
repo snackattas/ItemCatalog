@@ -1,4 +1,4 @@
-from pkg import app, db, moment, session
+from pkg import app, db, session
 from databaseSetup import User, Category, Item
 from databaseSetup import CategoryImage, ItemImage, ChangeLog
 
@@ -106,6 +106,46 @@ def isURLImage(url):
     h.close()
     return (url, "")
 
+# Function to make date difference human readable, for the Recent Activity
+# Copied from here:
+# http://stackoverflow.com/questions/1551382/user-friendly-time-format-in-python
+def pretty_date(time=False):
+    now = datetime.datetime.now()
+    if type(time) is int:
+        diff = now - datetime.fromtimestamp(time)
+    elif isinstance(time,datetime.datetime):
+        diff = now - time
+    elif not time:
+        diff = now - now
+    second_diff = diff.seconds
+    day_diff = diff.days
+
+    if day_diff < 0:
+        return ''
+
+    if day_diff == 0:
+        if second_diff < 10:
+            return "just now"
+        if second_diff < 60:
+            return str(second_diff) + " seconds ago"
+        if second_diff < 120:
+            return "a minute ago"
+        if second_diff < 3600:
+            return str(second_diff / 60) + " minutes ago"
+        if second_diff < 7200:
+            return "an hour ago"
+        if second_diff < 86400:
+            return str(second_diff / 3600) + " hours ago"
+    if day_diff == 1:
+        return "yesterday"
+    if day_diff < 7:
+        return str(day_diff) + " days ago"
+    if day_diff < 31:
+        return str(day_diff / 7) + " weeks ago"
+    if day_diff < 365:
+        return str(day_diff / 30) + " months ago"
+    return str(day_diff / 365) + " years ago"
+
 
 # Queries the ChangeLog database, returns 10 latest changes
 def changes():
@@ -119,9 +159,12 @@ def changes():
 @app.route('/publicCategory/')
 def showPublicCategory():
     categories = Category.query.order_by(db.asc(Category.name)).all()
+    total_categories = len(categories) - 1
     with store_context(store):
         return render_template('publicCategory.html', categories=categories,
-                               changes=changes())
+                               changes=changes(), pretty_date=pretty_date,
+                               total_categories=total_categories,
+                               enumerate=enumerate)
 
 
 @app.route('/publicCategory/<int:category_id>/')
@@ -146,9 +189,13 @@ def showPublicItem(category_id):
 @requires_login
 def showCategory():
     categories = Category.query.order_by(db.asc(Category.name)).all()
+    total_categories = len(categories) - 1
     with store_context(store):
         return render_template('category.html', categories=categories,
-                               login_session=login_session, changes=changes())
+                               login_session=login_session, changes=changes(),
+                               pretty_date=pretty_date,
+                               total_categories=total_categories,
+                               enumerate=enumerate)
 
 
 @app.route('/category/new/', methods=['GET', 'POST'])

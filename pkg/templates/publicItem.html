@@ -9,16 +9,17 @@
 		<div class="col-md-12"></div>
 	</div>
 	<div class="row banner menu">
-		<div class="col-md-11 col-md-offset-1 padding-none">
-			<h1>{{ category.name }}
+		<div class="col-md-9 col-md-offset-1 padding-none">
+			<h1>{{ category.name }}</h1>
+		</div>
+		<div class="col-md-2">
 			<figure class="creator">
 				<img src="{{ creator.picture}}">
 				<figcaption>{{ creator.name }}</figcaption>
 			</figure>
-			</h1>
+		</div>
 
 		</div>
-	</div>
 
 {% with messages = get_flashed_messages() %}
 	{% if messages %}
@@ -34,8 +35,6 @@
 	{% endif %}
 {% endwith %}
 
-	</div>
-	</div>
 	{% if items !=[] %}
 		<div class="row">
 			<div class="col-md-1"></div>

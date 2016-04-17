@@ -3,10 +3,18 @@
 	font-weight: 700;
 }
 
+body {
+  background: url("background.png") no-repeat center center fixed;
+  background-size: cover;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+}
+
 h1 {
 	font-family: "Helvetica Neue Light", Roboto, Helvetica, Arial, sans-serif;
 	font-size: 50px;
-	color: #51453B;
+	color: white;
 	line-height: 60px;
 	font-weight: 300;
 }
@@ -82,8 +90,8 @@ h3 {
 	margin-right: 10px;
 }
 .top-menu {
-	padding-top: 30px;
-	padding-bottom: 30px;
+	padding: 30px 20px;
+	width: 100%;
 }
 .top-menu p {
 	margin-bottom: 0;
@@ -98,6 +106,7 @@ h3 {
 }
 .divider {
 	height: 15px;
+	margin: 0 10px;
 }
 .divider.blue {
 	background-color: #42C3C9;
@@ -105,6 +114,11 @@ h3 {
 .divider.green {
 	background-color: #9FB80A;
 }
+
+.banner {
+	margin: 0 10px;
+}
+
 .banner.main {
 	height: 150px;
 	background: url("/static/top-banner.jpg");
@@ -113,7 +127,6 @@ h3 {
 	background-size: cover;
 }
 .banner.menu {
-	height: 150px;
 	background-color: #E1E17F;
 }
 .banner.profile {
@@ -124,8 +137,10 @@ h3 {
 	margin: 45px 0;
 }
  .restaurant-list {
- 	background-color: #F0F0F0;
+ 	border-style: solid;
+	border-color: black;
  	padding: 20px;
+	border-radius: 10px;
 u }
  .restaurant-list:hover {
  	background-color: #e1e17f;
@@ -142,8 +157,8 @@ u }
 }
 .creator {
 	padding-right: 20px;
-	margin-top: -20px;
-	text-align: right;
+	margin-top: 20px;
+	text-align: center;
 	float:right;
 }
 .creator img {
@@ -154,31 +169,60 @@ u }
 	font-size: 14px;
 	color: #7B7573;
 	font-weight: 400;
-	margin-top: -20px;
+	margin-top: 7px;
 }
+
 .flash {
 	background-color: #98FB98;
-	width:100%;
 	text-decoration: none;
-
 }
 
 .flash li {
 	list-style-type: none;
 	text-align: center;
-
 }
 
 img.image {
 	height: 225px;
 	width: 225px;
+	border-radius: 25px;
+	display: inline;
 }
 
 form {
 	display: inline-block;;
 }
 
-button {
+img.login-img {
+	height: 50px;
+	width: 50px;
+	border-radius: 6px;
+}
+
+.signin-buttons {
+	padding: 20px;
+}
+
+.login {
+	display: block;
+	height: 40px;
+	width: 80px;
+}
+
+.time {
+	color: grey;
+}
+
+.recent-activity {
+	border-radius: 25px;
+	opacity: .9;
+}
+
+h3.category-text {
 	display: inline;
-	margin-left: -115px;
+	padding-left: 30px;
+}
+
+.container {
+	background-color: rgba(176, 196, 222, 0.85);
 }

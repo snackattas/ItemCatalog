@@ -1,11 +1,15 @@
 <!DOCTYPE html>
-<html lang="en">
+<!-- <html lang="en"> -->
 	<head>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
     <script src="https://apis.google.com/js/client:platform.js?onload=start" async defer></script>
 	</head>
 	<body>
+		<div class="modal-header">
+				<h3>Select an option to sign in:</h3>
+		</div>
     <!-- Google sign in -->
+<div class="signin-buttons">
     <div id="signInButton">
       <span class="g-signin"
         data-scope="openid email"
@@ -14,7 +18,8 @@
         data-accesstype="offline"
         data-cookiepolicy="single_host_origin"
         data-callback="signInCallback"
-        data-approvalprompt="force">
+        data-approvalprompt="force"
+				data-width="wide">
       </span></div>
     <div id="result"></div>
     <script>
@@ -25,7 +30,7 @@
         // Send the one-time-use code to the server, if the server responds, write a 'login successful' message to the web page and then redirect back to the main restaurants page
         $.ajax({
           type: 'POST',
-          url: '/gconnect?state={{STATE}}', //pass the server state toekn to verify against cross state forgery attack
+          url: '/gconnect?state={{STATE}}', //pass the server state token to verify against cross state forgery attack
           processData: false,
           data: authResult['code'], //this is the one time use code
           contentType: 'application/octet-stream; charset=utf-8',
@@ -101,11 +106,12 @@
 
 
    <!-- the scope specifies the level of authorization with facebook -->
-            <fb:login-button scope="public_profile,email" onlogin="sendTokenToServer();">
+  <fb:login-button scope="public_profile,email" onlogin="sendTokenToServer();" data-size="xlarge">
   <a href='javascript:sendTokenToServer()'>Sign in</a>
 
   </fb:login-button>
-
-  <!--END FACEBOOK SIGN IN -->
-	</body>
+</div>
+<div class="modal-footer">
+	<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+</div>
 </html>

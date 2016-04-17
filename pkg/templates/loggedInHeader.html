@@ -1,14 +1,21 @@
 <div class="row top-menu">
-	<div class="col-md-6">
+	<div class="col-md-4">
 		<a href="{{url_for('showCategory')}}">
-			<span class="glyphicon glyphicon-home" aria-hidden="true"></span>Show All Categories
+			<button class="btn btn-default">
+				<span class="glyphicon glyphicon-home" aria-hidden="true"></span>Show All Categories
+			</button>
 		</a>
 	</div>
-	<div class="col-md-6 text-right">
-		<figure class="creator">
-			<img src="{{login_session['picture']}}">
-			<figcaption>{{login_session["username"]}}</figcaption>
-			<a href="{{url_for('disconnect')}}">Log Out</a>
-		</figure>
+	<div class="col-md-2 col-md-offset-4 text-center">
+		<img class="login-img" src="{{login_session['picture']}}">
+		<figcaption>{{login_session["username"]}}</figcaption>
+	</div>
+	<div class="col-md-2 text-right">
+		<a href="{{url_for('disconnect')}}">
+			<button class="btn btn-default">
+				<span class="glyphicon glyphicon-log-out"></span>
+				Logout
+			</button>
+		</a>
 	</div>
 </div>
