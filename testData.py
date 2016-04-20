@@ -1,3 +1,5 @@
+# This module creates 12 lizards, each with 4 hobbies
+
 from pkg import app, db, session
 from pkg.databaseSetup import User, Category, Item
 from pkg.main import isURLImage

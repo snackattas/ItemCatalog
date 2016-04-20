@@ -9,7 +9,7 @@ import datetime
 @app.route('/category/<int:category_id>/item/JSON/')
 def categoryItemJSON(category_id):
     items = Item.query.filter_by(category_id=category_id).all()
-    return jsonify(items=[items.serialize for item in items])
+    return jsonify(items=[item.serialize for item in items])
 
 
 @app.route('/category/<int:category_id>/item/<int:item_id>/JSON/')
@@ -17,6 +17,8 @@ def individualItemJSON(category_id, item_id):
     item = Item.query.filter_by(id=item_id).all()
     if item == []:
         item = Item()  # if no items, populate with null and don't crash
+    else:
+        item = item[0]
     return jsonify(item=item.serialize)
 
 

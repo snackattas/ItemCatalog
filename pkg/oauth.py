@@ -146,7 +146,7 @@ def fbconnect():
     output += '<img src="'
     output += login_session['picture']
     output += ' " style = "width: 200px; height: 200px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
-    flash("Now logged in as %s" % login_session['username'])
+    flash("Now logged in as %s with user id: %s" % (login_session['username'], login_session['user_id']))
     return output
 
 
@@ -237,7 +237,7 @@ def gconnect():
     output += '<img src="'
     output += login_session['picture']
     output += ' " style = "width: 200px; height: 200px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
-    ("you are now logged in as %s" % login_session['username'])
+    flash("Now logged in as %s with user id: %s" % (login_session['username'], login_session['user_id']))
     return output  # this should be a login template!
 
 
