@@ -61,3 +61,7 @@ Python, Javascript, HTML, CSS
 
 ## Dependencies
 All dependencies are part of the vagrant package and require no updates by the person forking the repo.
+
+## Screenshots
+![Lizard Homepage](/ItemCatalog/pkg/static/Lizard_Homepage.jpg?raw=true "Lizard Homepage")
+![Lizard's Hobby](/ItemCatalog/pkg/static/Lizard_Hobby.jpg?raw=true "Lizard's Hobbies")
