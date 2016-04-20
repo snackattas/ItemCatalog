@@ -2,26 +2,52 @@
 	<div class="col-md-6">
 		<a href="{{url_for('showCategory')}}">
 			<button class="btn btn-default">
-				<span class="glyphicon glyphicon-home" aria-hidden="true"></span>Show All Categories
+				<span class="glyphicon glyphicon-home" aria-hidden="true"></span>Show All Lizards
 			</button>
 		</a>
 	</div>
 	<div class="col-md-6 text-right">
-		<!-- <a href="{{url_for('showLogin')}}"> -->
-			<a data-toggle="modal" class=".btn-primary" href="{{url_for('showLogin')}}" data-target="#myModal">
-				<button class="btn btn-default">
-					<span class="glyphicon glyphicon-log-in"></span>
-					Login
-				</button>
-			</a>
-		<!-- </a> -->
+		<a data-toggle="modal" class=".btn-primary" href="{{url_for('showLogin')}}" data-target="#loginModal">
+			<button class="btn btn-default">
+				<span class="glyphicon glyphicon-log-in"></span>
+				Login
+			</button>
+		</a>
+		<button class="btn btn-default" data-toggle="modal" data-target=#infoModal>
+			<span class="glyphicon glyphicon-info-sign"></span>
+		</button>
 	</div>
+</div>
 
 	<!-- Modal -->
-	<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="true">
+	<div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="true">
 	    <div class="modal-dialog modal-sm">
 	        <div class="modal-content">
 	        </div> <!-- /.modal-content -->
 	    </div> <!-- /.modal-dialog -->
 	</div> <!-- /.modal -->
-</div>
+
+<div class="modal fade" id="infoModal" tabindex="-2" role="dialog" aria-labelledby="myModalLabel2" aria-hidden="true" data-backdrop="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<div class="modal-title">Lizard Database</div>
+			</div>
+			<div class="modal-body">
+				<p>Welcome to the Lizard Database created by Zach Attas as a project in Udacity's FullStack Web Developer Nanodegree.  </p>
+				<p>
+					Features:
+					<ul>
+						<li>Users can add their pet lizards to the database and their lizard's hobbies</li>
+						<li>Users can freely edit and delete their own entries, which are protected via Google or Facebook login</li>
+						<li>All entries are viewable; however, a user can only add entries or edit their own existing entries when logged in</li>
+					</ul>
+				</p>
+				<p>Store your lizards and their hobbies to your hearts content!</p>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			</div>
+		</div>
+	</div> <!-- /.modal-content -->
+</div> <!-- /.modal-dialog -->

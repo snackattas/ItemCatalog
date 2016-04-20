@@ -228,7 +228,6 @@ def newCategory():
         with store_context(store):
             new_category.picture.from_file(url_open)  # adding picture here
             session.add(new_category)
-            flash('New Category %s Successfully Created' % (new_category.name))
             session.commit()
             url_open.close()  # make sure to close url connection after commit
 
@@ -245,6 +244,8 @@ def newCategory():
             action="new",
             table="category")
         session.add(change_log)
+        flash('New Lizard %s Successfully Created' %\
+            (newest_category[0].name))
         session.commit()
         return redirect(url_for('showCategory'))
     else:
@@ -287,14 +288,15 @@ def editCategory(category_id):
             edited_category.picture.from_file(url_open)
             session.add(change_log)
             session.add(edited_category)
-            flash('Category Successfully Edited %s' % edited_category.name)
+            flash('Lizard %s Successfully Edited'  % edited_category.name)
             session.commit()
             url_open.close()
         return redirect(url_for('showCategory'))
     else:
-        return render_template('editCategory.html',
-                               category=edited_category,
-                               login_session=login_session)
+        with store_context(store):
+            return render_template('editCategory.html',
+                                   category=edited_category,
+                                   login_session=login_session)
 
 
 @app.route('/category/<int:category_id>/delete/', methods=['GET', 'POST'])
@@ -312,14 +314,15 @@ def deleteCategory(category_id):
         session.add(change_log)
         # Delete last, so information is still present to add to ChangeLog
         session.delete(category_to_delete)
-        flash('%s Successfully Deleted' % category_to_delete.name)
+        flash('Lizard %s Successfully Deleted' % category_to_delete.name)
         with store_context(store):
             session.commit()
         return redirect(url_for('showCategory'))
     else:
-        return render_template(
-            'deleteCategory.html', category=category_to_delete,
-            login_session=login_session)
+        with store_context(store):
+            return render_template(
+                'deleteCategory.html', category=category_to_delete,
+                login_session=login_session)
 
 
 @app.route('/category/<int:category_id>/')
@@ -367,7 +370,7 @@ def newItem(category_id):
         with store_context(store):
             new_item.picture.from_file(url_open)
             session.add(new_item)
-            flash('New Item %s Successfully Created' % (new_item.name))
+            flash('New Hobby %s Successfully Created' % (new_item.name))
             session.commit()
             url_open.close()
 
@@ -389,9 +392,10 @@ def newItem(category_id):
         session.commit()
         return redirect(url_for('showItem', category_id=category_id))
     else:
-        return render_template('newItem.html',
-                               category=category,
-                               login_session=login_session)
+        with store_context(store):
+            return render_template('newItem.html',
+                                   category=category,
+                                   login_session=login_session)
 
 
 @app.route(
@@ -444,16 +448,17 @@ def editItem(category_id, item_id):
         with store_context(store):
             edited_item.picture.from_file(url_open)
             session.add(change_log)
-            flash('Item %s Successfully Edited' % (edited_item.name))
+            flash('Hobby %s Successfully Edited' % (edited_item.name))
             session.commit()
             url_open.close()
         return redirect(url_for('showItem', category_id=category_id))
     else:
-        return render_template('editItem.html',
-                               category_id=category_id,
-                               item_id=item_id,
-                               item=edited_item,
-                               login_session=login_session)
+        with store_context(store):
+            return render_template('editItem.html',
+                                   category=category,
+                                   item_id=item_id,
+                                   item=edited_item,
+                                   login_session=login_session)
 
 
 @app.route(
@@ -476,13 +481,14 @@ def deleteItem(category_id, item_id):
 
         session.add(change_log)
         session.delete(item_to_delete)
-        flash('Item %s Successfully Deleted' % (item_to_delete.name))
+        flash('Hobby %s Successfully Deleted' % (item_to_delete.name))
         with store_context(store):
             session.commit()
         return redirect(url_for('showItem', category_id=category_id))
     else:
-        return render_template('deleteItem.html', item=item_to_delete,
-                               login_session=login_session)
+        with store_context(store):
+            return render_template('deleteItem.html', category=category,
+            item=item_to_delete, login_session=login_session)
 
 
 @app.route('/error/')

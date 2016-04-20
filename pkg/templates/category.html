@@ -7,21 +7,22 @@
 </div>
 
 <div class="row banner main">
-	<div class="col-md-1"></div>
-	<div class="col-md-11 padding-none text-left">
-		<h1>Lizards</h1>
+	<div class="col-md-12 padding-none text-left lizard-header">
+		<h1>All Lizards</h1>
 	</div>
 </div>
 
-	{% with messages = get_flashed_messages() %}
-    {% if messages %}
-		<div class="row divider flash">
-			<div class="col-md-12">
-				<strong> {{ message }} </strong> </li>
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+		{% for message in messages %}
+			<div class="row divider flash">
+				<div class="col-md-12">
+					<strong> {{ message }} </strong> </li>
+				</div>
 			</div>
-		</div>
-    {% endif %}
-  {% endwith %}
+		{% endfor %}
+  {% endif %}
+{% endwith %}
 
 
 <div class="row padding-top padding-bottom">
@@ -29,7 +30,7 @@
 	<div class="col-md-10 padding-none">
 		<a href="{{url_for('newCategory')}}">
 			<button class="btn btn-default" id="new-restaurant">
-				<span class="glyphicon glyphicon-globe" aria-hidden="true"></span>Add Category
+				<span class="glyphicon glyphicon-globe" aria-hidden="true"></span>Add Lizard
 			</button>
 		</a>
 	</div>
@@ -44,32 +45,31 @@
 {% for either in changes %}
 	{% if either.table == 'category' %}
 		{% if either.action == 'new' %}
-			<li>Category <a href="{{ url_for('showCategory', _anchor=either.category_id) }}"><i>{{either.category_name}}</i></a> added <span class="time"> {{pretty_date(either.update_instant)}}</span></li>
+			<li>Lizard <a href="{{ url_for('showCategory', _anchor=either.category_id) }}"><i>{{either.category_name}}</i></a> added <span class="time"> {{pretty_date(either.update_instant)}}</span></li>
 		{% endif %}
 		{% if either.action == 'update' %}
-			<li>Category <a href="{{ url_for('showCategory', _anchor=either.category_id) }}"><i>{{either.category_name}}</i></a> updated <span class="time"> {{pretty_date(either.update_instant)}}</span></li>
+			<li>Lizard <a href="{{ url_for('showCategory', _anchor=either.category_id) }}"><i>{{either.category_name}}</i></a> updated <span class="time"> {{pretty_date(either.update_instant)}}</span></li>
 		{% endif %}
 		{% if either.action == 'delete' %}
-			<li>Category <i>{{either.category_name}}</i></a> deleted <span class="time"> {{pretty_date(either.update_instant)}}</span></li>
+			<li>Lizard <i>{{either.category_name}}</i></a> deleted <span class="time"> {{pretty_date(either.update_instant)}}</span></li>
 		{% endif %}
 	{% endif %}
 	{% if either.table == 'item' %}
 		{% if either.action == 'new' %}
-			<li>Item <a href="{{ url_for('showItem', category_id=either.category_id, _anchor=either.item_id) }}"><i>{{either.item_name}}</i></a> added to Category <a href="{{ url_for('showCategory', _anchor=either.category_id) }}"><i>{{either.category_name}}</i></a > <span class="time"> {{pretty_date(either.update_instant)}}</span></li>
+			<li>Hobby <a href="{{ url_for('showItem', category_id=either.category_id, _anchor=either.item_id) }}"><i>{{either.item_name}}</i></a> added to Lizard <a href="{{ url_for('showCategory', _anchor=either.category_id) }}"><i>{{either.category_name}}</i></a > <span class="time"> {{pretty_date(either.update_instant)}}</span></li>
 		{% endif %}
 		{% if either.action == 'update' %}
-			<li>Item <a href="{{ url_for('showItem', category_id=either.category_id, _anchor=either.item_id) }}"><i>{{either.item_name}}</i></a> updated in Category <a href="{{ url_for('showCategory', _anchor=either.category_id) }}"><i>{{either.category_name}}</i></a > <span class="time"> {{pretty_date(either.update_instant)}}</span></li>
+			<li>Hobby <a href="{{ url_for('showItem', category_id=either.category_id, _anchor=either.item_id) }}"><i>{{either.item_name}}</i></a> updated in Lizard <a href="{{ url_for('showCategory', _anchor=either.category_id) }}"><i>{{either.category_name}}</i></a > <span class="time"> {{pretty_date(either.update_instant)}}</span></li>
 		{% endif %}
 		{% if either.action == 'delete' %}
-			<li>Item <i>{{either.item_name}}</i></a> deleted from Category <a href="{{ url_for('showCategory', _anchor=either.category_id) }}"><i>{{either.category_name}}</i></a > <span class="time"> {{pretty_date(either.update_instant)}}</span></li>
+			<li>Hobby <i>{{either.item_name}}</i></a> deleted from Lizard <a href="{{ url_for('showCategory', _anchor=either.category_id) }}"><i>{{either.category_name}}</i></a > <span class="time"> {{pretty_date(either.update_instant)}}</span></li>
 		{% endif %}
 	{% endif %}
 {% endfor %}
 </div>
 </div>
-{% endif %}
-
 <div class="row padding-top padding-bottom"></div>
+{% endif %}
 
 {% for (number, category) in enumerate(categories) %}
 	{% if number%2 == 0 %}
@@ -80,7 +80,7 @@
 					<a href = "{{ url_for('showItem', category_id = category.id) }}" id={{category.id}}>
 						<div class="col-md-10 restaurant-list">
 							<img class="image" src="{{category.picture.locate()}}">
-							<h3 class="category-text text-left text-justify">{{category.name}}</h3>
+							<figcaption class="text-justify">{{category.name}}</figcaption>
 						</div>
 					</a>
 					<div class="col-md-1"></div>
@@ -98,7 +98,7 @@
 				<a href = "{{ url_for('showItem', category_id = category.id) }}" id={{category.id}}>
 					<div class="col-md-10 restaurant-list">
 						<img class="image" src="{{category.picture.locate()}}">
-						<h3 class="category-text text-left text-justify">{{category.name}}</h3>
+						<figcaption class="text-justify">{{category.name}}</figcaption>
 					</div>
 				</a>
 				<div class="col-md-1"></div>
@@ -111,7 +111,7 @@
 {% if categories == [] %}
 	<div class="col-md-1"></div>
 		<div class="col-md-10">
-			<h3>No Categories Added Yet</h3>
+			<h3>No Lizards Added Yet</h3>
 		</div>
 		<div class="col-md-1"></div>
 	</div>

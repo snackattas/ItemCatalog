@@ -5,15 +5,18 @@
 	<div class="col-md-12"></div>
 </div>
 <div class="row banner menu">
-	<div class="col-md-11 col-md-offset-1 padding-none">
-		<h1>Edit Item</h1>
+	<div class="col-md-3 padding-none">
+		<img class="image header" src="{{item.picture.locate()}}">
+	</div>
+	<div class="col-md-9 header-text">
+		<h1>Edit Lizard {{category.name}}'s Hobby "{{item.name}}"</h1>
 	</div>
 </div>
 <div class="row">
 	<div class="col-md-10 col-md-offset-1 padding-top">
 		<form action="#" method = "post">
 			<div class="form-group">
-				<label for="name">Name:</label>
+				<label for="name">Name of hobby:</label>
 				<input type ="text" maxlength="100" id="name" class="form-control" name="name" value="{{item.name}}">
 				<div class="padding-bottom"></div>
 				<label for="description">Description:</label>

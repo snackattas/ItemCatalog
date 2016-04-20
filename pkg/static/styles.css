@@ -21,7 +21,7 @@ h1 {
 
 h2 {
 	font-size: 24px;
-	color: #42C3C9;
+	color: #1C3A9C;
 	line-height: 29px;
 }
 
@@ -89,6 +89,9 @@ h3 {
 .glyphicon {
 	margin-right: 10px;
 }
+.glyphicon-info-sign {
+	margin-right: 0px;
+}
 .top-menu {
 	padding: 30px 20px;
 	width: 100%;
@@ -105,7 +108,7 @@ h3 {
 	font-weight: 400;
 }
 .divider {
-	height: 15px;
+	height: 22px;
 	margin: 0 10px;
 }
 .divider.blue {
@@ -126,23 +129,35 @@ h3 {
 	background-repeat: no-repeat;
 	background-size: cover;
 }
+
 .banner.menu {
 	background-color: #E1E17F;
 }
+
 .banner.profile {
 	height: 150px;
 	background-color: #A6E8EB;
 }
+
 .banner h1 {
 	margin: 45px 0;
 }
+
  .restaurant-list {
  	border-style: solid;
 	border-color: black;
  	padding: 20px;
 	border-radius: 10px;
-u }
- .restaurant-list:hover {
+	display: inline-block;
+	text-align: center;
+}
+
+.restaurant-list figcaption {
+	text-align: center;
+	padding-top: 10px;
+}
+
+.restaurant-list:hover {
  	background-color: #e1e17f;
  	padding: 20px;
 }
@@ -151,6 +166,7 @@ u }
 	padding: 20px;
 	margin: 20px;
 	margin-left: -20px;
+	height: 265px;
 }
 .menu-price {
 	font-weight: 700;
@@ -158,8 +174,7 @@ u }
 .creator {
 	padding-right: 20px;
 	margin-top: 20px;
-	text-align: center;
-	float:right;
+	display: inline-block;
 }
 .creator img {
 	width: 100px;
@@ -170,15 +185,26 @@ u }
 	color: #7B7573;
 	font-weight: 400;
 	margin-top: 7px;
+	text-align: center;
 }
 
+.login-header {
+	float: right;
+}
+.login-user {
+	display: inline-block;
+	margin-right: 5px;
+}
+
+.login-button {
+	float: right;
+	margin-left: 5px;
+}
+.login-name {
+	text-align: center;
+}
 .flash {
 	background-color: #98FB98;
-	text-decoration: none;
-}
-
-.flash li {
-	list-style-type: none;
 	text-align: center;
 }
 
@@ -187,6 +213,18 @@ img.image {
 	width: 225px;
 	border-radius: 25px;
 	display: inline;
+}
+img.header{
+	margin: 20px;
+}
+
+.banner h1 {
+	display: inline;
+}
+
+.header-text {
+	display: flex;
+	padding-left: 20px;
 }
 
 form {
@@ -211,6 +249,7 @@ img.login-img {
 
 .time {
 	color: grey;
+	font-style: italic;
 }
 
 .recent-activity {
@@ -218,11 +257,12 @@ img.login-img {
 	opacity: .9;
 }
 
-h3.category-text {
-	display: inline;
-	padding-left: 30px;
-}
 
 .container {
 	background-color: rgba(176, 196, 222, 0.85);
+}
+
+.lizard-header {
+	margin-top: 80px;
+	margin-left: 20px;
 }

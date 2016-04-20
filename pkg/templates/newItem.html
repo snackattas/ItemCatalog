@@ -5,19 +5,22 @@
 	<div class="col-md-12"></div>
 </div>
 <div class="row banner menu">
-	<div class="col-md-11 col-md-offset-1 padding-none">
-		<h1>New Item for {{ category.name }}</h1>
+	<div class="col-md-3 padding-none">
+		<img class="image header" src="{{category.picture.locate()}}">
+	</div>
+	<div class="col-md-9 header-text">
+		<h1>New Hobby for {{ category.name }}</h1>
 	</div>
 </div>
 <div class="row">
 	<div class="col-md-10 col-md-offset-1 padding-top">
 		<form action="#" method = "post">
 			<div class="form-group">
-				<label for="name">Name:</label>
-				<input type ="text" maxlength="50" id="name" class="form-control" name="name" placeholder="Name of the item">
+				<label for="name">Name of hobby:</label>
+				<input type ="text" maxlength="50" id="name" class="form-control" name="name" placeholder="Name of the hobby">
 				<div class="padding-bottom"></div>
 				<label for="description">Description:</label>
-				<textarea id="description" class="form-control" maxlength="250" rows="3" name="description" placeholder="Description of the item"></textarea>
+				<textarea id="description" class="form-control" maxlength="250" rows="3" name="description" placeholder="Description of the hobby"></textarea>
 				<div class="padding-bottom"></div>
 				<label for="url">Image Url:</label>
 				<input type ="text" id="url" class="form-control" maxlength="500" name="url">
