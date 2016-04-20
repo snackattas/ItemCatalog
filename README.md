@@ -45,13 +45,19 @@ This is a Lizard database web application created as project 3 of [Udacity's Ful
 ## Test Data
 If you want to populate the lizard database with data automatically, use the [testData.py](https://github.com/snackattas/ItemCatalog/blob/master/testData.py)  script.  
 Here's how to run the script:
+
 1. First follow the setup steps to get the app up and running.
 2. Create a user by logging into the web app.  Record the user id of your user.  It will be shown in the flash message.
 3. In the top-level directory, run this command `python testData.py [user id]` subbing in "user id" with your user id.
 
 ## Technologies used
-* Languages: Python, Javascript, HTML, CSS
-* Python third parties used: [Flask](http://flask.pocoo.org/docs/0.10/), [Flask-SQLAlchemy](http://flask-sqlalchemy.pocoo.org/2.1/), [SQLAlchemy-ImageAttach](http://sqlalchemy-imageattach.readthedocs.org/en/stable/index.html), [Werkzeug's Atom Syndication module](http://werkzeug.pocoo.org/docs/0.11/contrib/atom/)
+### Languages used
+Python, Javascript, HTML, CSS
+### Python third parties used
+* [Flask](http://flask.pocoo.org/docs/0.10/)
+* [Flask-SQLAlchemy](http://flask-sqlalchemy.pocoo.org/2.1/)
+* [SQLAlchemy-ImageAttach](http://sqlalchemy-imageattach.readthedocs.org/en/stable/index.html)
+* [Werkzeug's Atom Syndication module](http://werkzeug.pocoo.org/docs/0.11/contrib/atom/)
 
 ## Dependencies
 All dependencies are part of the vagrant package and require no updates by the person forking the repo.
