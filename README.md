@@ -18,36 +18,36 @@ This is a Lizard database web application created as project 3 of [Udacity's Ful
 ## Endpoints
 ### JSON
 #### [localhost:8000/category/JSON/](localhost:8000/category/JSON/)
-Displays all lizards with this metadata:
-* creation_instant
-* id
-* name
-* picture_url
-#### localhost:8000/category/<category_id>/item/JSON/
-Displays all hobbies of a particular lizard with this metadata
-* creation_instant
-* description
-* id
-* name
-* picture_url
-#### localhost:8000/category/<category_id>/item/<item_id>/JSON/
-Displays only one hobby, with same metadata as above
+    Displays all lizards with this metadata:
+    - creation_instant
+    - id
+    - name
+    - picture_url
+#### localhost:8000/category/\[category_id\]/item/JSON/
+    Displays all hobbies of a particular lizard with this metadata
+    - creation_instant
+    - description
+    - id
+    - name
+    - picture_url
+#### localhost:8000/category/\[category_id\]/item/\[item_id\]/JSON/
+    Displays only one hobby, with same metadata as above
 ### Atom
 #### [localhost:8000/category.atom/](localhost:8000/category.atom/)
-Displays all lizards
+    Displays all lizards
 #### [localhost:8000/item.atom/](localhost:8000/item.atom/)
-Displays all hobbies
+    Displays all hobbies
 #### [localhost:8000/all.atom/](localhost:8000/all.atom/)
-Displays all lizards and hobbies
+    Displays all lizards and hobbies
 ####[localhost:8000/changes.atom/](localhost:8000/changes.atom/)
-Displays all content of the recent activity feed
+    Displays all content of the recent activity feed
 
 ## Test Data
 If you want to populate the lizard database with data automatically, use the [testData.py](https://github.com/snackattas/ItemCatalog/blob/master/testData.py)  script.  
 Here's how to run the script:
 1. First follow the setup steps to get the app up and running.
 2. Create a user by logging into the web app.  Record the user id of your user.  It will be shown in the flash message.
-3. In the top-level directory, run this command `python testData.py <user id>` subbing in "<user id>" with your user id.
+3. In the top-level directory, run this command `python testData.py [user id]` subbing in "user id" with your user id.
 
 ## Technologies used
 * Languages: Python, Javascript, HTML, CSS
