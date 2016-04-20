@@ -1,4 +1,4 @@
-# Lizard Database
+# Lizard Web Application
 This is a Lizard database web application created as project 3 of [Udacity's Full Stack Web Developer Nanodegree](https://www.udacity.com/course/full-stack-web-developer-nanodegree--nd004).  It is meant to organize one's lizards and their various hobbies.  It is currently run on localhost, but it could be deployed to the web in the future.
 
 ## Features
@@ -24,7 +24,7 @@ This is a Lizard database web application created as project 3 of [Udacity's Ful
     - name
     - picture_url
 #### localhost:8000/category/\[category_id\]/item/JSON/
-    Displays all hobbies of a particular lizard with this metadata
+    Displays all hobbies of a particular lizard with this metadata:
     - creation_instant
     - description
     - id
