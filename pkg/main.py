@@ -15,18 +15,18 @@ from urllib2 import urlopen
 
 from functools import wraps
 import datetime
+import os
 
 store = HttpExposedFileSystemStore(
-    path='/vagrant/pkg/images/',
-    prefix='/static/pkg/images/'
-)
+    path=os.path.join(os.path.dirname(__file__), "images"))
 
 app.wsgi_app = store.wsgi_middleware(app.wsgi_app)
 
 
 # Helper Functions
-# Decorator for routes only accessable when logged in
 def requires_login(function):
+    """requires_login: a decorator for routes that are designed to be accessible
+    only when logged in"""
     @wraps(function)
     def decorated_function(*args, **kwargs):
         if 'username' not in login_session:
@@ -39,11 +39,10 @@ def requires_login(function):
     return decorated_function
 
 
-# Decorator for routes only accessable when logged in as the creator of a
-# particular category
-# Intended for the routes pertaining to items
-# Uses the category_id kwarg
 def requires_creator(function):
+    """requires_creator: a decorator for routes that are designed to be
+    accessible only when logged in as the same user as the creator of the
+    category being edited/deleted"""
     @wraps(function)
     def decorated_function(*args, **kwargs):
         if 'username' not in login_session:
@@ -65,8 +64,27 @@ def requires_creator(function):
     return decorated_function
 
 
-# Checks if url's content-type is image via HEAD request, for less overhead
 def isURLImage(url):
+    """isURLImage: Checks if the content-type of the url passed in is an image
+    url via a HEAD request, for less overhead
+
+    Args:
+        url: url must meet certain qualifications
+            - Must have a content-type of image/png, image/jpeg, image/jpg, or
+              image/svg+xml
+            - Must have content-length of less than 3MB
+    Returns:
+        url: If url meets qualifications, it will be returned; if url is
+             incorrect, null will be returned
+        error: If url meets qualifications, null will be returned; if url is
+               incorrect, a specific error message will be returned
+    Example:
+        url = "http://www.google.com/logos/doodles/2015/winter-solstice-2015-brazil-5991092264632320-hp2x.jpg"
+        (url, error) = IsURLImage(url)
+        if error:
+            return render_template('error.html', error=error)
+        """
+
     acceptable_image_types = ['image/png', 'image/jpeg', 'image/jpg',
                               'image/svg+xml']
     scheme, host, path, params, query, fragment = urlparse.urlparse(url)
@@ -110,6 +128,12 @@ def isURLImage(url):
 # Copied from here:
 # http://stackoverflow.com/questions/1551382/user-friendly-time-format-in-python
 def pretty_date(time=False):
+    """pretty_date: Makes a date difference human-readable
+
+    Args:
+        time [default=False]: A python date object
+    Returns: The time difference between the time passed in and now, in
+             human-readable form"""
     now = datetime.datetime.now()
     if type(time) is int:
         diff = now - datetime.fromtimestamp(time)
@@ -147,8 +171,9 @@ def pretty_date(time=False):
     return str(day_diff / 365) + " years ago"
 
 
-# Queries the ChangeLog database, returns 10 latest changes
 def changes():
+    """changes: Returns the 10 latest changes (add, delete, update) to
+                categories and items, in descending order"""
     changes = ChangeLog.query.\
         order_by(db.desc('update_instant')).limit(10).all()
     return changes
@@ -158,6 +183,11 @@ def changes():
 @app.route('/')
 @app.route('/publicCategory/')
 def showPublicCategory():
+    """showPublicCategory: Displays categories, does not require login
+
+    Routes:
+        '/'
+        '/publicCategory/'"""
     categories = Category.query.order_by(db.asc(Category.name)).all()
     total_categories = len(categories) - 1
     with store_context(store):
@@ -170,6 +200,10 @@ def showPublicCategory():
 @app.route('/publicCategory/<int:category_id>/')
 @app.route('/publicCategory/<int:category_id>/publicItem/')
 def showPublicItem(category_id):
+    """showPublicItem: Displays items from a particular category; does not
+                       require login
+
+    Arguments are derived from the url"""
     category = Category.query.filter_by(id=category_id).all()
     if category == []:
         flash('This category does not exist')
@@ -188,6 +222,7 @@ def showPublicItem(category_id):
 @app.route('/category/')
 @requires_login
 def showCategory():
+    "showCategory: Displays all categories; requires login"
     categories = Category.query.order_by(db.asc(Category.name)).all()
     total_categories = len(categories) - 1
     with store_context(store):
@@ -201,6 +236,8 @@ def showCategory():
 @app.route('/category/new/', methods=['GET', 'POST'])
 @requires_login
 def newCategory():
+    """newCategory: Displays new category creation form and posts new category
+                    to the database; requires login"""
     if request.method == 'POST':
         # First check to see if image URL is valid from HEAD reqauest.
         # If its not return error
@@ -210,7 +247,7 @@ def newCategory():
             return render_template('newCategory.html',
                                    login_session=login_session,
                                    error=error)
-        # Try to open the URL (urlopen uses a GET request)
+        # urlopen uses a GET request and does not accept HTTPS urls
         try:
             url_open = urlopen(url)
         except:
@@ -255,6 +292,10 @@ def newCategory():
 @app.route('/category/<int:category_id>/edit/', methods=['GET', 'POST'])
 @requires_creator
 def editCategory(category_id):
+    """editCategory: Displays form to edit a category's name and/or image url
+                     and posts that information to the database; requires login
+
+    Arguments are derived from the url"""
     edited_category = Category.query.filter_by(id=category_id).one()
     if request.method == 'POST':
         url = request.form['url']
@@ -302,6 +343,10 @@ def editCategory(category_id):
 @app.route('/category/<int:category_id>/delete/', methods=['GET', 'POST'])
 @requires_creator
 def deleteCategory(category_id):
+    """deleteCategory: Displays form to delete a category and posts that
+                       information to the database; requires login
+
+    Arguments are derived from the url"""
     category_to_delete = Category.query.filter_by(id=category_id).one()
     if request.method == 'POST':
         change_log = ChangeLog(
@@ -329,6 +374,12 @@ def deleteCategory(category_id):
 @app.route('/category/<int:category_id>/item/')
 @requires_creator
 def showItem(category_id):
+    """showItem: Displays all items of a particular category; requires login
+                 and that the logged-in user is also the user that created the
+                 category
+
+    Args:
+        category_id: : ID of the category being edited"""
     category = Category.query.filter_by(id=category_id).one()
     items = Item.query.filter_by(category_id=category_id).all()
     creator = User.query.filter_by(id=category.user_id).one()
@@ -342,6 +393,11 @@ def showItem(category_id):
 @app.route('/category/<int:category_id>/item/new/', methods=['GET', 'POST'])
 @requires_creator
 def newItem(category_id):
+    """newItem: Displays new item creation form and posts new item to the
+                database; requires login and that the logged-in user is also
+                the user that created the category
+
+    Arguments are derived from the url"""
     category = Category.query.filter_by(id=category_id).one()
     if request.method == 'POST':
         url = request.form['url']
@@ -403,6 +459,12 @@ def newItem(category_id):
     methods=['GET', 'POST'])
 @requires_creator
 def editItem(category_id, item_id):
+    """editItem: Displays form to edit a particular item's name, description,
+                 and/or image url and posts that information to the database;
+                 requires login and that the logged-in user is also the user
+                 that created the category
+
+    Arguments are derived from the url"""
     category = Category.query.filter_by(id=category_id).one()
     edited_item = Item.query.\
         filter_by(id=item_id, category_id=category_id).one()
@@ -466,6 +528,11 @@ def editItem(category_id, item_id):
     methods=['GET', 'POST'])
 @requires_creator
 def deleteItem(category_id, item_id):
+    """deleteItem: Displays form to delete an item and posts that information
+                   to the database; requires login and that the logged-in user
+                   is also the user that created the category
+
+    Arguments are derived from the url"""
     category = Category.query.filter_by(id=category_id).one()
     item_to_delete = Item.query.\
         filter_by(id=item_id, category_id=category_id).one()

@@ -198,7 +198,7 @@ def changesATOM():
 
     updated = None
     if changes != []:
-        updated = changes[0].creation_instant
+        updated = changes[0].update_instant
 
     feed = AtomFeed(
         'Changes to Category Database',

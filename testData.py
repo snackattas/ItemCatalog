@@ -9,7 +9,8 @@ from sqlalchemy_imageattach.stores.fs import HttpExposedFileSystemStore
 from urllib2 import urlopen
 
 import sys
-
+import json
+import os
 # First check if user passed in a valid integer
 try:
     user_id = int(sys.argv[1])
@@ -22,356 +23,44 @@ try:
 except:
     raise ValueError
 
+
 store = HttpExposedFileSystemStore(
-    path='/vagrant/pkg/images/',
-    prefix='/static/pkg/images/'
-)
+    path=os.path.join(os.path.dirname(__file__), "pkg/images"))
 
 app.wsgi_app = store.wsgi_middleware(app.wsgi_app)
 
-lizards = [
-    {
-        'name': 'Bubba',
-        'picture_url': "http://animals.sandiegozoo.org/sites/default/files/juicebox_slides/red_headed_rock_agama.jpg",
-        'hobbies': [
-            {
-                'name': 'Rock climbing',
-                'description': 'I love rock climbing.  My feet make it super easy to scale large rocks.  Hanging upside down is totally rad.',
-                'picture_url': "http://asme.berkeley.edu/wordpress/wp-content/uploads/2013/11/Rock-Climbing-Wallpaper-HD.jpg"
-            },
-            {
-                "name": "Being multicolored",
-                "description": "My colors change based on my mood.  And if I want to camo!",
-                "picture_url": "http://www.hippieshop.com/mas_assets/full/10592.jpg"
-            },
-            {
-                "name": "Awkward eye contact",
-                "description": "It's hilarious when lizards can't get this basic skill down.  It's a important part of culture, ya know?",
-                "picture_url": "http://www.quickanddirtytips.com/sites/default/files/styles/insert_small/public/images/6861/bad-eye-contact-looking-up.jpg?itok=NXNkjOlb"
-            },
-            {
-                "name": "Having a rad tail",
-                "description": "I try not to flaunt it, but it's too hard.  My tail is rad and I'm proud of it.  Plz don't pull on it or you'll get tail whipped.",
-                "picture_url": "http://orig10.deviantart.net/a335/f/2009/095/9/f/treecko_by_renelaranxa.png"
-            }
-        ]
-    },
-    {
-        "name": "Travis",
-        "picture_url": "http://15858-presscdn-0-65.pagely.netdna-cdn.com/wp-content/uploads/sites/default/files/images/http-inlinethumb39.webshots.com-43814-2502382980104237032S600x600Q85.jpg",
-        "hobbies": [
-            {
-                "name": "Striking a pose",
-                "description": "It's a known fact that some lizards are more gifted at striking a pose than other lizards.  Take me, for example.  I don't have to try even - I'm always ready to strike a pose.",
-                "picture_url": "http://i.huffpost.com/gen/1248671/images/o-DANCEMOVES-facebook.jpg"
-            },
-            {
-                "name": "Frilled Neck",
-                "description": "This is dreadlocks for lizards.",
-                "picture_url": "http://cdn.dreadshop.com/media/catalog/product/cache/small_image/300x/17f82f742ffe127f42dca9de82fb58b1/t/w/twisted-dikke-dreads.jpg"
-            },
-            {
-                "name": "Push ups",
-                "description": "Gotta stay fit.  Gotta stay fit.",
-                "picture_url": "http://workoutlabs.com/wp-content/uploads/watermarked/Pushup.png"
-            },
-            {
-                "name": "Amazing eye contact",
-                "description": "When I look your way, you'll surely look back, and totally perceive the gravity of what I'm saying.  You know what they say, the eyes are a window into the soul.",
-                "picture_url": "http://specials-images.forbesimg.com/imageserve/5a4c796fb6cf1f3cf270868d21aead48/0x600.jpg?fit=scale&background=000000"
-            }
-        ]
-    },
-    {
-        "name": "Cindy",
-        "picture_url": "http://animaliaz-life.com/data_images/lizard/lizard9.jpg",
-        "hobbies": [
-            {
-                "name": "Striking a pose",
-                "description": "It's a known fact that some lizards are more gifted at striking a pose than other lizards.  Take me, for example.  I don't have to try even - I'm always ready to strike a pose.",
-                "picture_url": "http://i.huffpost.com/gen/1248671/images/o-DANCEMOVES-facebook.jpg"
-            },
-            {
-                "name": "Push ups",
-                "description": "Gotta stay fit.  Gotta stay fit.",
-                "picture_url": "http://workoutlabs.com/wp-content/uploads/watermarked/Pushup.png"
-            },
-            {
-                'name': 'Rad scales',
-                'description': "It takes a lot of product to maintain these scales day in and day out.",
-                'picture_url': 'http://images.crestock.com/450000-459999/457203-xs.jpg'
-            },
-            {
-                'name': 'Being multicolored',
-                'description': 'My colors change based on my mood.  And if I want to camo!',
-                'picture_url': 'http://www.hippieshop.com/mas_assets/full/10592.jpg'
-            }
-        ]
-    },
-    {
-        'name': 'Braynard',
-        'picture_url': 'http://www.bluetongueskink.org/wp-content/uploads/2012/04/blue-tongue-skink-characteristics1.jpg',
-        'hobbies': [
-            {
-                'name': 'Striking a pose',
-                'description': "It's a known fact that some lizards are more gifted at striking a pose than other lizards.  Take me, for example.  I don't have to try even - I'm always ready to strike a pose.",
-                'picture_url': 'http://i.huffpost.com/gen/1248671/images/o-DANCEMOVES-facebook.jpg'
-            },
-            {
-                'name': 'Making fun of others',
-                'description': "Don't mess with me.  I can duel with the masters in insult rap.",
-                'picture_url': 'http://www.nashvilleparent.com/wp-content/uploads/2013/04/mean.jpg'
-            },
-            {
-                'name': 'Push ups',
-                'description': "Gotta stay fit.  Gotta stay fit.",
-                'picture_url': 'http://workoutlabs.com/wp-content/uploads/watermarked/Pushup.png'
-            },
-            {
-                'name': 'Amazing eye contact',
-                'description': "When I look your way, you'll surely look back, and totally perceive the gravity of what I'm saying.  You know what they say, the eyes are a window into the soul.",
-                'picture_url': 'http://specials-images.forbesimg.com/imageserve/5a4c796fb6cf1f3cf270868d21aead48/0x600.jpg?fit=scale&background=000000'
-            }
-        ]
-    },
-    {
-        'name': 'Seth',
-        'picture_url': 'http://cdn.gothic.life/wp-content/uploads/2015/06/dragon-flying-lizard-600x801.jpg',
-        'hobbies': [
-            {
-                'name': 'Striking a pose',
-                'description': "It's a known fact that some lizards are more gifted at striking a pose than other lizards.  Take me, for example.  I don't have to try even - I'm always ready to strike a pose.",
-                'picture_url': 'http://i.huffpost.com/gen/1248671/images/o-DANCEMOVES-facebook.jpg'
-            },
-            {
-                'name': 'Making fun of others',
-                'description': "Don't mess with me.  I can duel with the masters in insult rap.",
-                'picture_url': 'http://www.nashvilleparent.com/wp-content/uploads/2013/04/mean.jpg'
-            },
-            {
-                'name': 'Rad scales',
-                'description': "It takes a lot of product to maintain these scales day in and day out.",
-                'picture_url': 'http://images.crestock.com/450000-459999/457203-xs.jpg'
-            },
-            {
-                'name': 'Wingz',
-                'description': "I can't fly with them per-se but they are still rad.",
-                'picture_url': 'http://previews.123rf.com/images/shyleen/shyleen1202/shyleen120200006/12372384-pair-of-wings-Stock-Vector-wings-angel-tattoo.jpg'
-            }
-        ]
-    },
-    {
-        'name': 'Humbert',
-        'picture_url': 'http://www.wired.com/images_blogs/wiredscience/2014/01/Chameleon3-660x494.jpg',
-        'hobbies': [
-            {
-                'name': 'Striking a pose',
-                'description': "It's a known fact that some lizards are more gifted at striking a pose than other lizards.  Take me, for example.  I don't have to try even - I'm always ready to strike a pose.",
-                'picture_url': 'http://i.huffpost.com/gen/1248671/images/o-DANCEMOVES-facebook.jpg'
-            },
-            {
-                'name': 'Making fun of others',
-                'description': "Don't mess with me.  I can duel with the masters in insult rap.",
-                'picture_url': 'http://www.nashvilleparent.com/wp-content/uploads/2013/04/mean.jpg'
-            },
-            {
-                'name': 'Weight lifting',
-                'description': "Gotta stay fit.  Gotta stay fit.",
-                'picture_url': 'http://workoutlabs.com/wp-content/uploads/watermarked/Pushup.png'
-            },
-            {
-                'name': 'Rad scales',
-                'description': "It takes a lot of product to maintain these scales day in and day out.",
-                'picture_url': 'http://images.crestock.com/450000-459999/457203-xs.jpg'
-            }
-        ]
-    },
-    {
-        'name': 'Timmy',
-        'picture_url': 'http://www.californiaherps.com/lizards/images/podarcissp410Bcu.jpg',
-        'hobbies': [
-            {
-                'name': 'Awkward eye contact',
-                'description': "It's hilarious when lizards can't get this basic skill down.  It's a important part of culture, ya know?",
-                'picture_url': 'http://www.quickanddirtytips.com/sites/default/files/styles/insert_small/public/images/6861/bad-eye-contact-looking-up.jpg?itok=NXNkjOlb'
-            },
-            {
-                'name': 'Striking a pose',
-                'description': "It's a known fact that some lizards are more gifted at striking a pose than other lizards.  Take me, for example.  I don't have to try even - I'm always ready to strike a pose.",
-                'picture_url': 'http://i.huffpost.com/gen/1248671/images/o-DANCEMOVES-facebook.jpg'
-            },
-            {
-                'name': 'Crawling through tiny openings',
-                'description': "My size may seem like a disadvantage, but only I can fit through there!",
-                'picture_url': 'http://static5.businessinsider.com/image/55f421d1dd0895a6788b467e-400-300/anthropologist-marina-elliott-squeezes-through-a-tight-spot-here-but-the-chute-was-the-real-bruiser-an-expedition-blog-noted-at-the-time-squeezing-through-tiny-openings-jamming-knees-and-elbows-into-cracks-for-stability-and-unavoidably-swinging-or-banging-into-the-countless-spines-and-protuberances-has-given-these-explorers-what-amounts-to-temporary-full-body-leopard-print-tattoos.jpg'
-            },
-            {
-                'name': 'Chillin',
-                'description': "Chillin like a villain all day erry day.",
-                'picture_url': 'http://www.todaysplanet.com/pg/beta/lizardlover/pic/henry_lizardlover_3_hollywood_lizards.jpg'
-            }
-        ]
-    },
-    {
-        'name': 'Lindsay',
-        'picture_url': 'http://i.dailymail.co.uk/i/pix/2012/07/26/article-2179157-1438EB63000005DC-241_634x416.jpg',
-        'hobbies': [
-            {
-                'name': 'Striking a pose',
-                'description': "It's a known fact that some lizards are more gifted at striking a pose than other lizards.  Take me, for example.  I don't have to try even - I'm always ready to strike a pose.",
-                'picture_url': 'http://i.huffpost.com/gen/1248671/images/o-DANCEMOVES-facebook.jpg'
-            },
-            {
-                'name': 'Making fun of others',
-                'description': "Don't mess with me.  I can duel with the masters in insult rap.",
-                'picture_url': 'http://www.nashvilleparent.com/wp-content/uploads/2013/04/mean.jpg'
-            },
-            {
-                'name': 'Weight lifting',
-                'description': "Gotta stay fit.  Gotta stay fit.",
-                'picture_url': 'http://workoutlabs.com/wp-content/uploads/watermarked/Pushup.png'
-            },
-            {
-                'name': 'Being prehistoric',
-                'description': "I may be old, but please don't ask me how old I am.  That would be considered rude",
-                'picture_url': 'http://www.arbgames.com.au/images/T/RB%20100P%20Time%20Of%20The%20Dinosaurs.JPG'
-            }
-        ]
-    },
-    {
-        'name': 'Carlin',
-        'picture_url': 'http://aqualandpetsplus.com/Lizard294.jpg',
-        'hobbies': [
-            {
-                'name': 'Awkward eye contact',
-                'description': "It's hilarious when lizards can't get this basic skill down.  It's a important part of culture, ya know?",
-                'picture_url': 'http://www.quickanddirtytips.com/sites/default/files/styles/insert_small/public/images/6861/bad-eye-contact-looking-up.jpg?itok=NXNkjOlb'
-            },
-            {
-                'name': 'Striking a pose',
-                'description': "It's a known fact that some lizards are more gifted at striking a pose than other lizards.  Take me, for example.  I don't have to try even - I'm always ready to strike a pose.",
-                'picture_url': 'http://i.huffpost.com/gen/1248671/images/o-DANCEMOVES-facebook.jpg'
-            },
-            {
-                'name': 'Rad scales',
-                'description': "It takes a lot of product to maintain these scales day in and day out.",
-                'picture_url': 'http://images.crestock.com/450000-459999/457203-xs.jpg'
-            },
-            {
-                'name': 'Crawling through tiny openings',
-                'description': "My size may seem like a disadvantage, but only I can fit through there!",
-                'picture_url': 'http://static5.businessinsider.com/image/55f421d1dd0895a6788b467e-400-300/anthropologist-marina-elliott-squeezes-through-a-tight-spot-here-but-the-chute-was-the-real-bruiser-an-expedition-blog-noted-at-the-time-squeezing-through-tiny-openings-jamming-knees-and-elbows-into-cracks-for-stability-and-unavoidably-swinging-or-banging-into-the-countless-spines-and-protuberances-has-given-these-explorers-what-amounts-to-temporary-full-body-leopard-print-tattoos.jpg'
-            }
-        ]
-    },
-    {
-        'name': 'Terence',
-        'picture_url': 'http://cx.aos.ask.com/question/aq/700px-394px/feed-lizards_69b62b643056dbf1.jpg',
-        'hobbies': [
-            {
-                'name': 'Striking a pose',
-                'description': "It's a known fact that some lizards are more gifted at striking a pose than other lizards.  Take me, for example.  I don't have to try even - I'm always ready to strike a pose.",
-                'picture_url': 'http://i.huffpost.com/gen/1248671/images/o-DANCEMOVES-facebook.jpg'
-            },
-            {
-                'name': 'Making fun of others',
-                'description': "Don't mess with me.  I can duel with the masters in insult rap.",
-                'picture_url': 'http://www.nashvilleparent.com/wp-content/uploads/2013/04/mean.jpg'
-            },
-            {
-                'name': 'Weight lifting',
-                'description': "Gotta stay fit.  Gotta stay fit.",
-                'picture_url': 'http://workoutlabs.com/wp-content/uploads/watermarked/Pushup.png'
-            },
-            {
-                'name': 'Mohawk',
-                'description': "I'm a punk deal with it.",
-                'picture_url': 'http://40.media.tumblr.com/e4b294086cfca15e7f5e2b121e26a90f/tumblr_mubmposhvZ1qj9p1so1_1280.jpg'
-            }
-        ]
-    },
-    {
-        'name': 'Taylor',
-        'picture_url': 'http://zoo.sandiegozoo.org/sites/default/files/animal_hero/T11_0774_039.jpg',
-        'hobbies': [
-            {
-                'name': 'Striking a pose',
-                'description': "It's a known fact that some lizards are more gifted at striking a pose than other lizards.  Take me, for example.  I don't have to try even - I'm always ready to strike a pose.",
-                'picture_url': 'http://i.huffpost.com/gen/1248671/images/o-DANCEMOVES-facebook.jpg'
-            },
-            {
-                'name': 'Weight lifting',
-                'description': "Gotta stay fit.  Gotta stay fit.",
-                'picture_url': 'http://workoutlabs.com/wp-content/uploads/watermarked/Pushup.png'
-            },
-            {
-                'name': 'Making fun of others',
-                'description': "Don't mess with me.  I can duel with the masters in insult rap.",
-                'picture_url': 'http://www.nashvilleparent.com/wp-content/uploads/2013/04/mean.jpg'
-            },
-            {
-                'name': 'Push ups',
-                'description': "Gotta stay fit.  Gotta stay fit.",
-                'picture_url': 'http://workoutlabs.com/wp-content/uploads/watermarked/Pushup.png'
-            }
-        ]
-    },
-    {
-        'name': 'Fran',
-        'picture_url': 'http://userscontent2.emaze.com/images/dacc7948-ba03-4ecd-b516-967bb260ae21/61579353-195f-4aeb-93ba-84843cc295b9image7.jpeg',
-        'hobbies': [
-            {
-                'name': 'Striking a pose',
-                'description': "It's a known fact that some lizards are more gifted at striking a pose than other lizards.  Take me, for example.  I don't have to try even - I'm always ready to strike a pose.",
-                'picture_url': 'http://i.huffpost.com/gen/1248671/images/o-DANCEMOVES-facebook.jpg'
-            },
-            {
-                'name': 'Crawling through tiny openings',
-                'description': "My size may seem like a disadvantage, but only I can fit through there!",
-                'picture_url': 'http://static5.businessinsider.com/image/55f421d1dd0895a6788b467e-400-300/anthropologist-marina-elliott-squeezes-through-a-tight-spot-here-but-the-chute-was-the-real-bruiser-an-expedition-blog-noted-at-the-time-squeezing-through-tiny-openings-jamming-knees-and-elbows-into-cracks-for-stability-and-unavoidably-swinging-or-banging-into-the-countless-spines-and-protuberances-has-given-these-explorers-what-amounts-to-temporary-full-body-leopard-print-tattoos.jpg'
-            },
-            {
-                'name': 'Wingz',
-                'description': "I can't fly with them per-se but they are still rad.",
-                'picture_url': 'http://previews.123rf.com/images/shyleen/shyleen1202/shyleen120200006/12372384-pair-of-wings-Stock-Vector-wings-angel-tattoo.jpg'
-            },
-            {
-                'name': 'Chillin',
-                'description': "Chillin like a villain all day erry day.",
-                'picture_url': 'http://www.todaysplanet.com/pg/beta/lizardlover/pic/henry_lizardlover_3_hollywood_lizards.jpg'
-            }
-        ]
-    }
-]
+with open("testData.JSON") as data_file:
+    lizards = json.load(data_file)
+    for lizard in lizards["lizards"]:
+        category = Category(
+            name=lizard["name"],
+            user_id=user_id,
+            picture_url=lizard["picture_url"])
+        (url, error) = isURLImage(lizard["picture_url"])
+        if not error:
+            url_open = urlopen(url)
+            with store_context(store):
+                category.picture.from_file(url_open)
+                session.add(category)
+                session.commit()
+                url_open.close()
 
-for lizard in lizards:
-    category = Category(
-        name=lizard['name'],
-        user_id=user_id,
-        picture_url=lizard['picture_url'])
-    (url, error) = isURLImage(lizard['picture_url'])
-    url_open = urlopen(url)
-    with store_context(store):
-        category.picture.from_file(url_open)
-        session.add(category)
-        session.commit()
-        url_open.close()
+            new_category = Category.query.filter_by(
+                user_id=user_id, name=lizard["name"]).order_by(db.desc("creation_instant")).limit(1).all()
+            new_category_id = new_category[0].id
 
-    new_category = Category.query.filter_by(
-        user_id=user_id, name=lizard['name']).order_by(db.desc('creation_instant')).limit(1).all()
-    new_category_id = new_category[0].id
-
-    for hobby in lizard['hobbies']:
-        a_hobby = Item(
-            name=hobby['name'],
-            description=hobby['description'],
-            picture_url=hobby['picture_url'],
-            category_id=new_category_id,
-            user_id=user_id)
-        (url, error) = isURLImage(hobby['picture_url'])
-        url_open = urlopen(url)
-        with store_context(store):
-            a_hobby.picture.from_file(url_open)
-            session.add(a_hobby)
-            session.commit()
-            url_open.close()
+            for hobby in lizard["hobbies"]:
+                a_hobby = Item(
+                    name=hobby["name"],
+                    description=hobby["description"],
+                    picture_url=hobby["picture_url"],
+                    category_id=new_category_id,
+                    user_id=user_id)
+                (url, error) = isURLImage(hobby["picture_url"])
+                if not error:
+                    url_open = urlopen(url)
+                    with store_context(store):
+                        a_hobby.picture.from_file(url_open)
+                        session.add(a_hobby)
+                        session.commit()
+                        url_open.close()
