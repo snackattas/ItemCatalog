@@ -4,7 +4,7 @@ This is a Lizard Catalog app created as project 3 of [Udacity's Full Stack Web D
 ## What exactly is a Lizard Catalog App?
 I believe coding something one cares about is far better than coding without drive or purpose.  Project 3 called for students to create a basic catalog app, where there were two data points connected with a parent/child relationship (like in this [sample website](https://docs.google.com/document/d/1jFjlq_f-hJoAZP8dYuo5H3xY62kGyziQmiv9EPIA7tM/pub?embedded=true)).
 
-Instead of creating an app to organize items within categories (generic and boring), I created an app to organize lizards and their hobbies! Is this practical? Not really.  But it brings me a smile every time I boot it up :).
+Instead of creating an app to organize hobbies within lizards (generic and boring), I created an app to organize lizards and their hobbies! Is this practical? Not really.  But it brings me a smile every time I boot it up :).
 
 ## Features
 * Supports secure user accounts
@@ -17,20 +17,20 @@ Instead of creating an app to organize items within categories (generic and bori
 
 ## Setup
 1. Secure shell into the [vagrant VM](https://www.vagrantup.com/docs/getting-started/) installed in this github repository.
-2. Navigate to the top-level directory and boot up the app with the command `python ItemCatalog.py`. Press ctrl+c to shut down the app.
+2. Navigate to the top-level directory and boot up the app with the command `python lizardCatalog.py`. Press ctrl+c to shut down the app.
 3. Open an internet browser and enter the url `localhost:8000`.
 
 ## JSON Endpoints
-### [localhost:8000/category/JSON/](localhost:8000/category/JSON/)
+### [localhost:8000/lizard/JSON/](localhost:8000/lizard/JSON/)
     Displays all lizards
-### localhost:8000/category/\[category_id\]/item/JSON/
-    Displays all hobbies of a particular lizard:
-### localhost:8000/category/\[category_id\]/item/\[item_id\]/JSON/
-    Displays only one hobby:
+### localhost:8000/lizard/\[lizard_id\]/hobby/JSON/
+    Displays all hobbies of a particular lizard
+### localhost:8000/lizard/\[lizard_id\]/hobby/\[hobby_id\]/JSON/
+    Displays only one hobby
 ## Atom Endpoints
-### [localhost:8000/category.atom/](localhost:8000/category.atom/)
+### [localhost:8000/lizard.atom/](localhost:8000/lizard.atom/)
     Displays all lizards
-### [localhost:8000/item.atom/](localhost:8000/item.atom/)
+### [localhost:8000/hobby.atom/](localhost:8000/hobby.atom/)
     Displays all hobbies
 ### [localhost:8000/all.atom/](localhost:8000/all.atom/)
     Displays all lizards and hobbies
@@ -38,7 +38,7 @@ Instead of creating an app to organize items within categories (generic and bori
     Displays all content of the recent activity feed
 
 ## Test Data
-If you want to populate the lizard database with data automatically, use the [testData.py](https://github.com/snackattas/ItemCatalog/blob/master/testData.py)  script.  
+If you want to populate the lizard database with data automatically, use the [testData.py](https://github.com/snackattas/LizardApp/blob/master/testData.py)  script.  
 Here's how to run the script:
 
 1. First follow the setup steps to get the app up and running.
