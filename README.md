@@ -4,7 +4,7 @@ This is a Lizard Catalog app created as project 3 of [Udacity's Full Stack Web D
 ## What exactly is a Lizard Catalog App?
 I believe coding something I care about is far better than coding without drive or purpose.  Project 3 calls for students to create a basic catalog app with two data points connected in a parent/child relationship (like in this [sample website](https://docs.google.com/document/d/1jFjlq_f-hJoAZP8dYuo5H3xY62kGyziQmiv9EPIA7tM/pub?embedded=true)).
 
-Instead of creating an app to organize hobbies within lizards (generic and boring), I created an app to organize lizards and their hobbies! Is this practical? No, not really.  But it brings me a smile every time I boot it up :).
+Instead of creating an app to organize items within categories (generic and boring), I created an app to organize lizards and their hobbies! Is this practical? No, not really.  But it brings me a smile every time I boot it up :).
 
 ## Features
 * Supports secure user accounts
