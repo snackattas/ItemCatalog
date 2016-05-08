@@ -20,23 +20,6 @@ Instead of creating an app to organize items within categories (generic and bori
 2. Navigate to the top-level directory and boot up the app with the command `python lizardCatalog.py`. Press ctrl+c to shut down the app.
 3. Open an internet browser and enter the url `localhost:8000`.
 
-## JSON Endpoints
-### [localhost:8000/lizard/JSON/](localhost:8000/lizard/JSON/)
-    Displays all lizards
-### localhost:8000/lizard/\[lizard_id\]/hobby/JSON/
-    Displays all hobbies of a particular lizard
-### localhost:8000/lizard/\[lizard_id\]/hobby/\[hobby_id\]/JSON/
-    Displays only one hobby
-## Atom Endpoints
-### [localhost:8000/lizard.atom/](localhost:8000/lizard.atom/)
-    Displays all lizards
-### [localhost:8000/hobby.atom/](localhost:8000/hobby.atom/)
-    Displays all hobbies
-### [localhost:8000/all.atom/](localhost:8000/all.atom/)
-    Displays all lizards and hobbies
-###[localhost:8000/changes.atom/](localhost:8000/changes.atom/)
-    Displays all content of the recent activity feed
-
 ## Test Data
 If you want to populate the lizard database with data automatically, use the [testData.py](https://github.com/snackattas/LizardApp/blob/master/testData.py)  script.  
 Here's how to run the script:
@@ -56,6 +39,23 @@ Python, Javascript, HTML, CSS
 
 ## Dependencies
 All dependencies are part of the vagrant package and require no updates by the person forking the repo.
+
+## JSON Endpoints
+### [localhost:8000/lizard/JSON/](localhost:8000/lizard/JSON/)
+    Displays all lizards
+### localhost:8000/lizard/\[lizard_id\]/hobby/JSON/
+    Displays all hobbies of a particular lizard
+### localhost:8000/lizard/\[lizard_id\]/hobby/\[hobby_id\]/JSON/
+    Displays only one hobby
+## Atom Endpoints
+### [localhost:8000/lizard.atom/](localhost:8000/lizard.atom/)
+    Displays all lizards
+### [localhost:8000/hobby.atom/](localhost:8000/hobby.atom/)
+    Displays all hobbies
+### [localhost:8000/all.atom/](localhost:8000/all.atom/)
+    Displays all lizards and hobbies
+###[localhost:8000/changes.atom/](localhost:8000/changes.atom/)
+    Displays all content of the recent activity feed
 
 ## Screenshots
 ![Lizard Homepage](/../master/pkg/static/Lizard%20Homepage.JPG?raw=true "Lizard Homepage")
