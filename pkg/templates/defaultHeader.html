@@ -1,6 +1,6 @@
 <div class="row top-menu">
 	<div class="col-md-6">
-		<a href="{{url_for('showCategory')}}">
+		<a href="{{url_for('showLizard')}}">
 			<button class="btn btn-default">
 				<span class="glyphicon glyphicon-home" aria-hidden="true"></span>Show All Lizards
 			</button>
@@ -31,18 +31,33 @@
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-header">
-				<div class="modal-title">Lizard Database</div>
+				<div class="modal-title"><h3><b>Lizard Catalog App</b><h3></div>
 			</div>
 			<div class="modal-body">
-				<p>Welcome to the Lizard Database created by Zach Attas as a project in Udacity's FullStack Web Developer Nanodegree.  </p>
+				<h3>Intro</h3>
 				<p>
-					Features:
+					Welcome to the Lizard Catalog App created as Project 3 of <a href="https://www.udacity.com/course/full-stack-web-developer-nanodegree--nd004" target="_blank">Udacity's Full Stack Web Developer Nanodegree</a> by Zach Attas.  I created this app to practice CRUD (create, read, update, delete) database operations and to practice incorporating 3rd-party frameworks and modules into my codebase.  It is currently run on localhost, but it could be deployed to the web in the future.
+				</p>
+				<h3>What exactly is a Lizard Catalog App?</h3>
+				<p>
+					I believe coding something I care about is far better than coding without drive or purpose.  Project 3 called for students to create a basic catalog app with two data points connected in a parent/child relationship (like in this <a href="https://docs.google.com/document/d/1jFjlq_f-hJoAZP8dYuo5H3xY62kGyziQmiv9EPIA7tM/pub?embedded=true" target="_blank">sample website</a>).
+				</br></br>
+					Instead of creating an app to organize items within categories (generic and boring), I created an app to organize lizards and their hobbies! Is this practical? No, not really.  But it brings me a smile every time I boot it up :).
+				</p>
+				<h3>Features</h3>
+				<p>
 					<ul>
-						<li>Users can add their pet lizards to the database and their lizard's hobbies</li>
-						<li>Users can freely edit and delete their own entries, which are protected via Google or Facebook login</li>
-						<li>All entries are viewable; however, a user can only add entries or edit their own existing entries when logged in</li>
+						<li>Supports secure user accounts</li>
+						<li>Supports Google and Facebook authentication</li>
+						<li>Enables image uploads from image urls for an enhanced UI experience</li>
+						<li>Logged-in users can add, edit, and delete their lizards and lizards' hobbies from the database</li>
+						<li>Every data point added to the database is viewable, but only the user who added the data can edit or delete it</li>
+						<li>A recent activity feed is displayed on the home page, showing the latest updates to the database</li>
+						<li>Data can be access via JSON and Atom Endpoints</li>
 					</ul>
 				</p>
+				</br>
+				<p>Code for this app can be found <a href="https://github.com/snackattas/LizardApp" target="_blank">on github</a></p>
 				<p>Store your lizards and their hobbies to your hearts content!</p>
 			</div>
 			<div class="modal-footer">

@@ -14,14 +14,14 @@ class User(db.Model):
     gplus_id = db.Column(db.String(80))
 
 
-class Category(db.Model):
-    __tablename__ = 'category'
+class Lizard(db.Model):
+    __tablename__ = 'lizard'
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(250), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     user = db.relationship(User)
-    picture = image_attachment('CategoryImage')
+    picture = image_attachment('LizardImage')
     picture_url = db.Column(db.String(500))
     creation_instant = db.Column(db.DateTime(timezone=True),
                                  default=datetime.datetime.utcnow)
@@ -37,17 +37,17 @@ class Category(db.Model):
         }
 
 
-class Item(db.Model):
-    __tablename__ = 'item'
+class Hobby(db.Model):
+    __tablename__ = 'hobby'
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), nullable=False)
     description = db.Column(db.String(250))
-    category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
-    category = db.relationship(Category)
+    lizard_id = db.Column(db.Integer, db.ForeignKey('lizard.id'))
+    lizard = db.relationship(Lizard)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     user = db.relationship(User)
-    picture = image_attachment('ItemImage')
+    picture = image_attachment('HobbyImage')
     picture_url = db.Column(db.String(500))
     creation_instant = db.Column(db.DateTime(timezone=True),
                                  default=datetime.datetime.utcnow)
@@ -64,39 +64,39 @@ class Item(db.Model):
         }
 
 
-# Category table that contains references to image files
-class CategoryImage(db.Model, Image):
-    __tablename__ = 'categoryimage'
-    category_id = db.Column(db.Integer, db.ForeignKey('category.id'),
+# Lizard table that contains references to image files
+class LizardImage(db.Model, Image):
+    __tablename__ = 'lizardimage'
+    lizard_id = db.Column(db.Integer, db.ForeignKey('lizard.id'),
                             primary_key=True)
-    category = db.relationship(Category)
+    lizard = db.relationship(Lizard)
 
 
-# Item table that contains references to image files
-class ItemImage(db.Model, Image):
-    __tablename__ = 'itemimage'
-    item_id = db.Column(db.Integer, db.ForeignKey('item.id'), primary_key=True)
-    item = db.relationship(Item)
+# Hobby table that contains references to image files
+class HobbyImage(db.Model, Image):
+    __tablename__ = 'hobbyimage'
+    hobby_id = db.Column(db.Integer, db.ForeignKey('hobby.id'), primary_key=True)
+    hobby = db.relationship(Hobby)
 
 
-# ChangeLog table that contains instants when a category or item is added,
+# ChangeLog table that contains instants when a lizard or hobby is added,
 # updated, or deleted
 class ChangeLog(db.Model):
     __tablename__ = 'changelog'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     user = db.relationship(User)
-    category_name = db.Column(db.String(80))
-    category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
-    category = db.relationship(Category)
-    item_name = db.Column(db.String(80))
-    item_id = db.Column(db.Integer, db.ForeignKey('item.id'))
-    item = db.relationship(Item)
+    lizard_name = db.Column(db.String(80))
+    lizard_id = db.Column(db.Integer, db.ForeignKey('lizard.id'))
+    lizard = db.relationship(Lizard)
+    hobby_name = db.Column(db.String(80))
+    hobby_id = db.Column(db.Integer, db.ForeignKey('hobby.id'))
+    hobby = db.relationship(Hobby)
     update_instant = db.Column(db.DateTime(timezone=True),
                                default=datetime.datetime.utcnow)
     # Possible actions are "new", "update", or "delete"
     action = db.Column(db.String(6))
-    # Possible tables are "category" or "item"
+    # Possible tables are "lizard" or "hobby"
     table = db.Column(db.String(9))
 
 # Command to create all these tables

@@ -1,7 +1,7 @@
 # This module creates 12 lizards, each with 4 hobbies
 
 from pkg import app, db, session
-from pkg.databaseSetup import User, Category, Item
+from pkg.databaseSetup import User, Lizard, Hobby
 from pkg.main import isURLImage
 
 from sqlalchemy_imageattach.context import store_context
@@ -31,36 +31,36 @@ app.wsgi_app = store.wsgi_middleware(app.wsgi_app)
 
 with open("testData.JSON") as data_file:
     lizards = json.load(data_file)
-    for lizard in lizards["lizards"]:
-        category = Category(
-            name=lizard["name"],
+    for next_lizard in lizards["lizards"]:
+        lizard = Lizard(
+            name=next_lizard["name"],
             user_id=user_id,
-            picture_url=lizard["picture_url"])
-        (url, error) = isURLImage(lizard["picture_url"])
+            picture_url=next_lizard["picture_url"])
+        (url, error) = isURLImage(next_lizard["picture_url"])
         if not error:
             url_open = urlopen(url)
             with store_context(store):
-                category.picture.from_file(url_open)
-                session.add(category)
+                lizard.picture.from_file(url_open)
+                session.add(lizard)
                 session.commit()
                 url_open.close()
 
-            new_category = Category.query.filter_by(
-                user_id=user_id, name=lizard["name"]).order_by(db.desc("creation_instant")).limit(1).all()
-            new_category_id = new_category[0].id
+            new_lizard = Lizard.query.filter_by(
+                user_id=user_id, name=next_lizard["name"]).order_by(db.desc("creation_instant")).limit(1).all()
+            new_lizard_id = new_lizard[0].id
 
-            for hobby in lizard["hobbies"]:
-                a_hobby = Item(
-                    name=hobby["name"],
-                    description=hobby["description"],
-                    picture_url=hobby["picture_url"],
-                    category_id=new_category_id,
+            for next_hobby in next_lizard["hobbies"]:
+                new_hobby = Hobby(
+                    name=next_hobby["name"],
+                    description=next_hobby["description"],
+                    picture_url=next_hobby["picture_url"],
+                    lizard_id=new_lizard_id,
                     user_id=user_id)
-                (url, error) = isURLImage(hobby["picture_url"])
+                (url, error) = isURLImage(next_hobby["picture_url"])
                 if not error:
                     url_open = urlopen(url)
                     with store_context(store):
-                        a_hobby.picture.from_file(url_open)
-                        session.add(a_hobby)
+                        new_hobby.picture.from_file(url_open)
+                        session.add(new_hobby)
                         session.commit()
                         url_open.close()

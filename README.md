@@ -1,45 +1,40 @@
-# Lizard Web Application
-This is a Lizard database web application created as project 3 of [Udacity's Full Stack Web Developer Nanodegree](https://www.udacity.com/course/full-stack-web-developer-nanodegree--nd004).  It is meant to organize one's lizards and their various hobbies.  It is currently run on localhost, but it could be deployed to the web in the future.
+# Lizard Catalog App
+This is a Lizard Catalog app created as project 3 of [Udacity's Full Stack Web Developer Nanodegree](https://www.udacity.com/course/full-stack-web-developer-nanodegree--nd004).  I created this app to practice CRUD (create, read, update, delete) database operations and to practice incorporating 3rd-party frameworks and modules into my codebase.  It is currently run on localhost, but it could be deployed to the web in the future.
+
+## What exactly is a Lizard Catalog App?
+I believe coding something one cares about is far better than coding without drive or purpose.  Project 3 called for students to create a basic catalog app, where there were two data points connected with a parent/child relationship (like in this [sample website](https://docs.google.com/document/d/1jFjlq_f-hJoAZP8dYuo5H3xY62kGyziQmiv9EPIA7tM/pub?embedded=true)).
+
+Instead of creating an app to organize items within categories (generic and boring), I created an app to organize lizards and their hobbies! Is this practical? Not really.  But it brings me a smile every time I boot it up :).
 
 ## Features
-* Supports user accounts so that one user does not tamper with another user's data.
-* Supports Google and Facebook authentication.
-* Grabs images from image urls and displays them to users for an enhanced UI experience.
-* Logged-in users can add, edit, and delete their lizards and lizards' hobbies from the database.
-* Every data point added to the database is viewable, but only the user who added the data can edit or delete it.
-* A recent activity feed is displayed on the home page, showing the latest updates to the database.
-* Data can be access via JSON and Atom Endpoints.
+* Supports secure user accounts
+* Supports Google and Facebook authentication
+* Enables image uploads from image urls for an enhanced UI experience
+* Logged-in users can add, edit, and delete their lizards and lizards' hobbies from the database
+* Every data point added to the database is viewable, but only the user who added the data can edit or delete it
+* A recent activity feed is displayed on the home page, showing the latest updates to the database
+* Data can be access via JSON and Atom Endpoints
 
 ## Setup
 1. Secure shell into the [vagrant VM](https://www.vagrantup.com/docs/getting-started/) installed in this github repository.
 2. Navigate to the top-level directory and boot up the app with the command `python ItemCatalog.py`. Press ctrl+c to shut down the app.
 3. Open an internet browser and enter the url `localhost:8000`.
 
-## Endpoints
-### JSON
-#### [localhost:8000/category/JSON/](localhost:8000/category/JSON/)
-    Displays all lizards with this metadata:
-    - creation_instant
-    - id
-    - name
-    - picture_url
-#### localhost:8000/category/\[category_id\]/item/JSON/
-    Displays all hobbies of a particular lizard with this metadata:
-    - creation_instant
-    - description
-    - id
-    - name
-    - picture_url
-#### localhost:8000/category/\[category_id\]/item/\[item_id\]/JSON/
-    Displays only one hobby, with same metadata as above
-### Atom
-#### [localhost:8000/category.atom/](localhost:8000/category.atom/)
+## JSON Endpoints
+### [localhost:8000/category/JSON/](localhost:8000/category/JSON/)
     Displays all lizards
-#### [localhost:8000/item.atom/](localhost:8000/item.atom/)
+### localhost:8000/category/\[category_id\]/item/JSON/
+    Displays all hobbies of a particular lizard:
+### localhost:8000/category/\[category_id\]/item/\[item_id\]/JSON/
+    Displays only one hobby:
+## Atom Endpoints
+### [localhost:8000/category.atom/](localhost:8000/category.atom/)
+    Displays all lizards
+### [localhost:8000/item.atom/](localhost:8000/item.atom/)
     Displays all hobbies
-#### [localhost:8000/all.atom/](localhost:8000/all.atom/)
+### [localhost:8000/all.atom/](localhost:8000/all.atom/)
     Displays all lizards and hobbies
-####[localhost:8000/changes.atom/](localhost:8000/changes.atom/)
+###[localhost:8000/changes.atom/](localhost:8000/changes.atom/)
     Displays all content of the recent activity feed
 
 ## Test Data

@@ -1,39 +1,39 @@
 from pkg import app, db
-from databaseSetup import User, Category, Item, ChangeLog
+from databaseSetup import User, Lizard, Hobby, ChangeLog
 from flask import request, jsonify
 from werkzeug.contrib.atom import AtomFeed
 import datetime
 
 
 # JSON API Endpoints
-@app.route('/category/<int:category_id>/item/JSON/')
-def categoryItemJSON(category_id):
-    items = Item.query.filter_by(category_id=category_id).all()
-    return jsonify(items=[item.serialize for item in items])
+@app.route('/lizard/<int:lizard_id>/hobby/JSON/')
+def lizardHobbyJSON(lizard_id):
+    hobbies = Hobby.query.filter_by(lizard_id=lizard_id).all()
+    return jsonify(hobbies=[hobby.serialize for hobby in hobbies])
 
 
-@app.route('/category/<int:category_id>/item/<int:item_id>/JSON/')
-def individualItemJSON(category_id, item_id):
-    item = Item.query.filter_by(id=item_id).all()
-    if item == []:
-        item = Item()  # if no items, populate with null and don't crash
+@app.route('/lizard/<int:lizard_id>/hobby/<int:hobby_id>/JSON/')
+def individualHobbyJSON(lizard_id, hobby_id):
+    hobby = Hobby.query.filter_by(id=hobby_id).all()
+    if hobby == []:
+        hobby = Hobby()  # if no hobbies, populate with null and don't crash
     else:
-        item = item[0]
-    return jsonify(item=item.serialize)
+        hobby = hobby[0]
+    return jsonify(hobby=hobby.serialize)
 
 
-@app.route('/category/JSON/')
-def categoryJSON():
-    categories = Category.query.all()
-    return jsonify(categories=[category.serialize for category in categories])
+@app.route('/lizard/JSON/')
+def lizardJSON():
+    lizards = Lizard.query.all()
+    return jsonify(lizards=[lizard.serialize for lizard in lizards])
 
 
 # ATOM API Endpoints
-@app.route('/category.atom/')
-def categoryATOM():
-    # Get the last added category's creation date to populate as the
+@app.route('/lizard.atom/')
+def lizardATOM():
+    # Get the last added lizard's creation date to populate as the
     # last updated date for the ATOM feed
-    latest_update = Category.query.order_by(
+    latest_update = Lizard.query.order_by(
         db.desc('creation_instant')).limit(1).all()
 
     updated = None
@@ -41,34 +41,34 @@ def categoryATOM():
         updated = latest_update[0].creation_instant
 
     feed = AtomFeed(
-        'All Categories',
+        'All Lizards',
         feed_url=request.url,
         url=request.url_root,
         author={'name': 'Zach Attas', 'email': 'zach.attas@gmail.com'},
-        id="http://localhost:8000/publicCategory/",
+        id="http://localhost:8000/publicLizard/",
         updated=updated)
 
-    categories = Category.query.order_by(db.desc('creation_instant')).all()
-    for category in categories:
-        user = User.query.filter_by(id=category.user_id).one()
-        url = "http://localhost:8000/publicCategory/#%s" % (category.id)
+    lizards = Lizard.query.order_by(db.desc('creation_instant')).all()
+    for lizard in lizards:
+        user = User.query.filter_by(id=lizard.user_id).one()
+        url = "http://localhost:8000/publicLizard/#%s" % (lizard.id)
         content = "Picture URL: <a href='%s'>%s</a>" % \
-            (category.picture_url, category.picture_url)
+            (lizard.picture_url, lizard.picture_url)
         feed.add(
-            category.name,
+            lizard.name,
             content,
             content_type='html',
             author={'name': user.name},
             url=url,
             id=url,
-            updated=category.creation_instant,
-            published=category.creation_instant)
+            updated=lizard.creation_instant,
+            published=lizard.creation_instant)
     return feed.get_response()
 
 
-@app.route('/item.atom/')
-def itemATOM():
-    latest_update = Item.query.order_by(
+@app.route('/hobby.atom/')
+def hobbyATOM():
+    latest_update = Hobby.query.order_by(
         db.desc('creation_instant')).limit(1).all()
 
     updated = None
@@ -76,43 +76,43 @@ def itemATOM():
         updated = latest_update[0].creation_instant
 
     feed = AtomFeed(
-        'All Items',
+        'All Hobbies',
         feed_url=request.url,
         url=request.url_root,
         author={'name': 'Zach Attas', 'email': 'zach.attas@gmail.com'},
-        id="http://localhost:8000/publicCategory/",
+        id="http://localhost:8000/publicLizard/",
         updated=updated)
 
-    items = Item.query.order_by(db.desc('creation_instant')).all()
-    for item in items:
-        category = Category.query.filter_by(id=item.category_id).one()
-        user = User.query.filter_by(id=item.user_id).one()
+    hobbies = Hobby.query.order_by(db.desc('creation_instant')).all()
+    for hobby in hobbies:
+        lizard = Lizard.query.filter_by(id=hobby.lizard_id).one()
+        user = User.query.filter_by(id=hobby.user_id).one()
         content = """
             Description: %s
             </br>
-            Category:
-            <a href='http://localhost:8000/publicCategory/#%s'>%s</a>
+            Lizard:
+            <a href='http://localhost:8000/publicLizard/#%s'>%s</a>
             </br>
             Picture URL: <a href='%s'>%s</a>""" % \
-            (item.description, category.id, category.name,
-                item.picture_url, item.picture_url)
-        url = "http://localhost:8000/publicCategory/%s/publicItem/#%s" % \
-            (category.id, item.id)
+            (hobby.description, lizard.id, lizard.name,
+                hobby.picture_url, hobby.picture_url)
+        url = "http://localhost:8000/publicLizard/%s/publicHobby/#%s" % \
+            (lizard.id, hobby.id)
         feed.add(
-            item.name,
+            hobby.name,
             content,
             content_type='html',
             author={'name': user.name},
             url=url,
             id=url,
-            updated=item.creation_instant,
-            published=item.creation_instant)
+            updated=hobby.creation_instant,
+            published=hobby.creation_instant)
     return feed.get_response()
 
 
 @app.route('/all.atom/')
 def allATOM():
-    # Query to perform union on all categories and items
+    # Query to perform union on all lizards and hobbies
     # Then sort results by creation instant
     results = db.engine.execute("""
         SELECT * FROM
@@ -123,9 +123,9 @@ def allATOM():
                 NULL as description,
                 creation_instant,
                 picture_url,
-                NULL as category_id,
-                "category" AS type
-            FROM Category
+                NULL as lizard_id,
+                "lizard" AS type
+            FROM Lizard
             UNION
             SELECT
                 id,
@@ -134,9 +134,9 @@ def allATOM():
                 description,
                 creation_instant,
                 picture_url,
-                category_id,
-                "item" AS type
-            FROM Item)
+                lizard_id,
+                "hobby" AS type
+            FROM Hobby)
         ORDER BY creation_instant DESC""").fetchall()
 
     updated = None
@@ -147,11 +147,11 @@ def allATOM():
             results[0].creation_instant, '%Y-%m-%d %H:%M:%S.%f')
 
     feed = AtomFeed(
-        'All Categories and Items',
+        'All Lizards and Hobbies',
         feed_url=request.url,
         url=request.url_root,
         author={'name': 'Zach Attas', 'email': 'zach.attas@gmail.com'},
-        id="http://localhost:8000/publicCategory/",
+        id="http://localhost:8000/publicLizard/",
         updated=updated)
 
     for result in results:
@@ -159,25 +159,25 @@ def allATOM():
         updated = datetime.datetime.strptime(
             result.creation_instant, '%Y-%m-%d %H:%M:%S.%f')
 
-        if result.type == 'category':
-            name = "Category %s" % (result.name)
-            url = "http://localhost:8000/publicCategory/#%s" % (result.id)
+        if result.type == 'lizard':
+            name = "Lizard %s" % (result.name)
+            url = "http://localhost:8000/publicLizard/#%s" % (result.id)
             content = "Picture URL: <a href='%s'>%s</a>" % \
                 (result.picture_url, result.picture_url)
 
-        if result.type == 'item':
-            category = Category.query.filter_by(id=result.category_id).one()
-            name = "Item %s" % (result.name)
-            url = "http://localhost:8000/publicCategory/%s/publicItem/#%s" % \
-                (category.id, result.id)
+        if result.type == 'hobby':
+            lizard = Lizard.query.filter_by(id=result.lizard_id).one()
+            name = "Hobby %s" % (result.name)
+            url = "http://localhost:8000/publicLizard/%s/publicHobby/#%s" % \
+                (lizard.id, result.id)
             content = """
                 Description: %s
                 </br>
-                Category:
-                <a href='http://localhost:8000/publicCategory/#%s'>%s</a>
+                Lizard:
+                <a href='http://localhost:8000/publicLizard/#%s'>%s</a>
                 </br>
                 Picture URL: <a href='%s'>%s</a>""" % \
-                (result.description, result.id, category.name,
+                (result.description, result.id, lizard.name,
                     result.picture_url, result.picture_url)
 
         feed.add(
@@ -201,35 +201,35 @@ def changesATOM():
         updated = changes[0].update_instant
 
     feed = AtomFeed(
-        'Changes to Category Database',
+        'Changes to Lizard Database',
         feed_url=request.url,
         url=request.url_root,
         author={'name': 'Zach Attas', 'email': 'zach.attas@gmail.com'},
-        id="http://localhost:8000/publicCategory/",
+        id="http://localhost:8000/publicLizard/",
         updated=updated)
 
     for change in changes:
         user = User.query.filter_by(id=change.user_id).one()
         content = "Action: %s" % (change.action)
 
-        if change.table == 'category':
-            name = "Category %s" % (change.category_name)
+        if change.table == 'lizard':
+            name = "Lizard %s" % (change.lizard_name)
             if change.action == 'delete':
                 url = None
-                unique_url = "http://localhost:8000/publicCategory/"
+                unique_url = "http://localhost:8000/publicLizard/"
             if change.action == 'new' or change.action == 'update':
-                url = "http://localhost:8000/publicCategory/#%s" % \
-                    (change.category_id)
+                url = "http://localhost:8000/publicLizard/#%s" % \
+                    (change.lizard_id)
                 unique_url = url
 
-        if change.table == 'item':
-            name = "Item %s" % (change.item_name)
+        if change.table == 'hobby':
+            name = "Hobby %s" % (change.hobby_name)
             if change.action == 'delete':
                 url = None
-                unique_url = "http://localhost:8000/publicCategory/"
+                unique_url = "http://localhost:8000/publicLizard/"
             if change.action == 'new' or change.action == 'update':
-                url = "http://localhost:8000/publicCategory/%s/publicItem/#%s" \
-                    % (change.category_id, change.item_id)
+                url = "http://localhost:8000/publicLizard/%s/publicHobby/#%s" \
+                    % (change.lizard_id, change.hobby_id)
                 unique_url = url
 
         feed.add(

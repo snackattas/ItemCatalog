@@ -1,6 +1,6 @@
 * {
 	font-family: "Helvetica Neue Bold", Roboto, Helvetica, Arial, sans-serif;
-	font-weight: 700;
+	font-weight: 400;
 }
 
 body {
@@ -26,7 +26,7 @@ h2 {
 }
 
 h3 {
-	font-size: 18px;
+	font-size: 22px;
 	color: #4A4A4A;
 	line-height: 23px;
 }
@@ -38,6 +38,10 @@ h3 {
  	font-weight: 400;
 	word-wrap: break-word;
  }
+
+.modal-body {
+	color: #7B7573;
+}
 
  strong {
  	font-size: 16px;
@@ -80,10 +84,10 @@ h3 {
 	border-color: #aaaaaa;
 	color: red;
 }
-.btn.cancel-category {
+.btn.cancel-lizard {
 	margin-left: -70px;
 }
-.btn.cancel-item {
+.btn.cancel-hobby {
 	margin-left: -70px;
 }
 .glyphicon {
@@ -161,7 +165,7 @@ h3 {
  	background-color: #e1e17f;
  	padding: 20px;
 }
-.menu-item {
+.menu-hobby {
 	background: #F0F0F0;
 	padding: 20px;
 	margin: 20px;
@@ -255,6 +259,7 @@ img.login-img {
 .recent-activity {
 	border-radius: 25px;
 	opacity: .9;
+	color: black;
 }
 
 

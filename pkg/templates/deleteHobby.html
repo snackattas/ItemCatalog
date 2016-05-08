@@ -1,0 +1,32 @@
+{% extends "main.html" %}
+{% block content %}
+{% include "loggedInHeader.html" %}
+<div class="row">
+	<div class="col-md-12">
+	<h2> Are you sure you want to delete Lizard {{lizard.name}}'s Hobby  "{{hobby.name}}"? </h2>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-md-12">
+		<img class="image" src="{{hobby.picture.locate()}}">
+	</div>
+</div>
+
+<div class="row padding-top padding-bottom"></div>
+
+<div class="row">
+	<div class="col-md-12">
+		<form action="#" method = 'post'>
+
+			<button type="submit" class="btn btn-default delete" id="submit" type="submit">
+			<span class="glyphicon glyphicon-trash" aria-hidden="true"></span>Delete</button>
+		</form>
+		<a href = "{{url_for('showHobby', lizard_id=hobby.lizard_id)}}">
+			<button class="btn btn-default delete">
+			<span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Cancel</button>
+		</a>
+	</div>
+</div>
+<div class="row padding-top padding-bottom"></div>
+{% endblock %}

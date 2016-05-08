@@ -1,0 +1,62 @@
+{% extends "main.html" %}
+{% block content %}
+{% include "loggedInHeader.html" %}
+<div class="row divider green">
+	<div class="col-md-12"></div>
+</div>
+<div class="row banner menu">
+	<div class="col-md-3 padding-none">
+		<img class="image header" src="{{hobby.picture.locate()}}">
+	</div>
+	<div class="col-md-9 header-text">
+		<h1>Edit Lizard {{lizard.name}}'s Hobby "{{hobby.name}}"</h1>
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-10 col-md-offset-1 padding-top">
+		<form action="#" method = "post">
+			<div class="form-group">
+				<label for="name">Name of hobby:</label>
+				<input type ="text" maxlength="100" id="name" class="form-control" name="name" value="{{hobby.name}}">
+				<div class="padding-bottom"></div>
+				<label for="description">Description:</label>
+				<textarea class="form-control" id="description" maxlength="250" rows="3" name="description">{{hobby.description}}</textarea>
+				<div class="padding-bottom"></div>
+				<label for="url">Image Url:</label>
+				<input type ="text" id="url" class="form-control" maxlength="500" name="url" value="{{hobby.picture_url}}">
+				<div class="padding-bottom"></div>
+				<button type="submit" class="btn btn-default" id="submit" type="submit">
+				<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Save</button>
+			</div>
+		</form>
+		<a href="{{url_for('showHobby', lizard_id=hobby.lizard_id)}}">
+			<button class="btn btn-default delete cancel-hobby">
+			<span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Cancel</button>
+		</a>
+		<div class="padding-bottom"></div>
+		<div class="error">{{error}}</div>
+	</div>
+</div>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js">
+</script>
+<script>
+$(document).ready(function() {
+  var priorName = $("#name").val();
+	var priorDescription = $("#description").val();
+  var priorURL = $("#url").val();
+  $("form").submit(function(e) {
+    var newName = $("#name").val();
+		var newDescription = $("#description").val();
+    var newURL = $("#url").val();
+    if ((newName === "") || (newDescription === "") || (newURL === "")) {
+      $('.error').html("Must have a Name, Description, and a URL");
+      e.preventDefault();
+    }
+    if ((newName === priorName) && (newURL === priorURL) && (newDescription === priorDescription)) {
+      $('.error').html("Name, Description, or URL must change before submitting");
+      e.preventDefault();
+    }
+  });
+});
+</script>
+{% endblock %}

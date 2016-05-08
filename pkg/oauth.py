@@ -283,7 +283,7 @@ def disconnect():
         del login_session['provider']
         del login_session['picture']
         flash('You have successfully been logged out.')
-        return redirect(url_for('showPublicCategory'))
+        return redirect(url_for('showPublicLizard'))
     else:
         flash('You are not logged in to begin with!')
-        return redirect(url_for('showPublicCategory'))
+        return redirect(url_for('showPublicLizard'))

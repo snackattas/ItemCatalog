@@ -1,0 +1,5 @@
+<head>
+  <title>All Lizards</title>
+  <link rel="alternate" type="application/atom+xml"
+   href="{{ url_for('categoryATOM') }}" title="Atom feed for All Lizards">
+</head>
