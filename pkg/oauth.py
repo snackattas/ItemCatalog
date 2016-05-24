@@ -52,20 +52,18 @@ def getFacebookUserID(login_session):
     user = User.query.filter_by(
         email=login_session.get('email'),
         facebook_id=login_session.get('facebook_id')).all()
-    if user != []:
-        return user[0].id
-    else:
+    if not user:
         return None
+    return user[0].id
 
 
 def getGoogleUserID(login_session):
     user = User.query.filter_by(
         email=login_session.get('email'),
         gplus_id=login_session.get('gplus_id')).all()
-    if user != []:
-        return user[0].id
-    else:
+    if not user:
         return None
+    return user[0].id
 
 
 def getUserID(login_session):
@@ -76,27 +74,27 @@ def getUserID(login_session):
     if login_session.get('facebook_id'):
         user = User.query.filter_by(
             facebook_id=login_session.get('facebook_id')).all()
-    if user != []:
-        return user[0].id
-    else:
+    if not user:
         return None
+    return user[0].id
 
 
 @app.route('/login/')
 def showLogin():
     # Create anti-forgery state token
-    state = ''.join(random.choice(string.ascii_uppercase + string.digits)
+    CSRF_token = ''.join(random.choice(string.ascii_uppercase + string.digits)
                     for x in xrange(32))
-    login_session['state'] = state
-    return render_template('login.html', STATE=state)
+    login_session['CSRF_token'] = CSRF_token
+    return render_template('login.html', CSRF_token=CSRF_token)
 
 
 @app.route('/fbconnect', methods=['POST'])
 def fbconnect():
-    if request.args.get('state') != login_session['state']:
-        response = make_response(json.dumps('Invalid state parameter.'), 401)
+    if request.args.get('state') != login_session['CSRF_token']:
+        response = make_response(json.dumps('Invalid CSRF token.'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
+    login.warning('in fbconnect')
     access_token = request.data
     app_id = json.loads(open('pkg/clientSecrets/fbClientSecrets.json', 'r').
                         read())['web']['app_id']
@@ -153,8 +151,8 @@ def fbconnect():
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
     # Validate against cross reference site forgery attacks
-    if request.args.get('state') != login_session['state']:
-        response = make_response(json.dumps('Invalid state parameter.'), 401)
+    if request.args.get('state') != login_session['CSRF_token']:
+        response = make_response(json.dumps('Invalid CSRF token.'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
     # Obtain authorization code
@@ -249,12 +247,11 @@ def gdisconnect():
     if result['status'] == '200':
         response = make_response(json.dumps('Successfully disconnected.'), 200)
         response.headers['Content-Type'] = 'application/json'
-        return response
     else:
         response = make_response(
             json.dumps('Failed to revoke token for given user.', 400))
         response.headers['Content-Type'] = 'application/json'
-        return response
+    return response
 
 
 def fbdisconnect():
@@ -265,25 +262,14 @@ def fbdisconnect():
         (facebook_id, access_token)
     h = httplib2.Http()
     result = h.request(url, 'DELETE')[1]
-    return "you have been logged out"
+    return result
 
 
 @app.route('/disconnect/')
 def disconnect():
     if 'provider' in login_session:
-        if login_session['provider'] == 'google':
-            gdisconnect()
-            del login_session['gplus_id']
-        if login_session['provider'] == 'facebook':
-            fbdisconnect()
-            del login_session['facebook_id']
-        del login_session['username']
-        del login_session['user_id']
-        del login_session['email']
-        del login_session['provider']
-        del login_session['picture']
-        flash('You have successfully been logged out.')
-        return redirect(url_for('showPublicLizard'))
+        login_session.clear()
+        flash('You are logged out!')
     else:
         flash('You are not logged in to begin with!')
-        return redirect(url_for('showPublicLizard'))
+    return redirect(url_for('showPublicLizard'))

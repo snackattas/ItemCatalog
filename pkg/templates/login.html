@@ -30,7 +30,7 @@
       // Send the one-time-use code to the server, if the server responds, write a 'login successful' message to the web page and then redirect back to the main restaurants page
       $.ajax({
         type: 'POST',
-        url: '/gconnect?state={{STATE}}', //pass the server state token to verify against cross state forgery attack
+        url: '/gconnect?state={{CSRF_token}}', //pass the server state token to verify against cross state forgery attack
         processData: false,
         data: authResult['code'], //this is the one time use code
         contentType: 'application/octet-stream; charset=utf-8',
@@ -80,7 +80,7 @@
         console.log('Successful login for: ' + response.name);
        $.ajax({
         type: 'POST',
-        url: '/fbconnect?state={{STATE}}',
+        url: '/fbconnect?state={{CSRF_token}}',
         processData: false,
         data: access_token,
         contentType: 'application/octet-stream; charset=utf-8',

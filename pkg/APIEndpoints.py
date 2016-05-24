@@ -15,7 +15,7 @@ def lizardHobbyJSON(lizard_id):
 @app.route('/lizard/<int:lizard_id>/hobby/<int:hobby_id>/JSON/')
 def individualHobbyJSON(lizard_id, hobby_id):
     hobby = Hobby.query.filter_by(id=hobby_id).all()
-    if hobby == []:
+    if not hobby:
         hobby = Hobby()  # if no hobbies, populate with null and don't crash
     else:
         hobby = hobby[0]
@@ -37,7 +37,7 @@ def lizardATOM():
         db.desc('creation_instant')).limit(1).all()
 
     updated = None
-    if latest_update != []:
+    if latest_update:
         updated = latest_update[0].creation_instant
 
     feed = AtomFeed(
@@ -72,7 +72,7 @@ def hobbyATOM():
         db.desc('creation_instant')).limit(1).all()
 
     updated = None
-    if latest_update != []:
+    if latest_update:
         updated = latest_update[0].creation_instant
 
     feed = AtomFeed(
@@ -140,7 +140,7 @@ def allATOM():
         ORDER BY creation_instant DESC""").fetchall()
 
     updated = None
-    if results != []:
+    if results:
         # Executing the query with raw SQL returns unicode, not python date
         # Need to convert it back to a python date
         updated = datetime.datetime.strptime(
@@ -197,7 +197,7 @@ def changesATOM():
     changes = ChangeLog.query.order_by(db.desc('update_instant')).all()
 
     updated = None
-    if changes != []:
+    if changes:
         updated = changes[0].update_instant
 
     feed = AtomFeed(

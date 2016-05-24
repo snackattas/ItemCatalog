@@ -35,7 +35,7 @@
   {% endif %}
 {% endwith %}
 
-{% if hobbies !=[] %}
+{% if hobbies %}
 	<div class="row">
 		<div class="col-md-1"></div>
 		<div class="col-md-10">
@@ -57,7 +57,7 @@
 		<div class="col-md-1"></div>
 	</div>
 {% endif %}
-	{% if hobbies == [] %}
+	{% if not hobbies %}
 	<div class="row">
 		<div class="col-md-1"></div>
 		<div class="col-md-3">

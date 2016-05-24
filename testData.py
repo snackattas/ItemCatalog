@@ -15,13 +15,13 @@ import os
 try:
     user_id = int(sys.argv[1])
 except:
-    raise ValueError
+    raise ValueError("User must pass in a valid integer")
 
 # Next check that the user_id actually exists
 try:
     user = User.query.filter_by(id = user_id).one()
 except:
-    raise ValueError
+    raise ValueError("User must pass in a valid user id")
 
 
 store = HttpExposedFileSystemStore(

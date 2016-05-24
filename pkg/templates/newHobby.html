@@ -29,9 +29,8 @@
 				<span class="glyphicon glyphicon-glass" aria-hidden="true"></span>Create</button>
 			</div>
 		</form>
-		<a href = "{{url_for('showHobby', lizard_id=lizard.id)}}">
-			<button class="btn btn-default delete cancel-hobby">
-			<span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Cancel</button>
+		<a button class="btn btn-default delete cancel-hobby" href = "{{url_for('showHobby', lizard_id=lizard.id)}}">
+			<span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Cancel
 		</a>
 		<div class="padding-bottom"></div>
 		<div class="error">{{error}}</div>

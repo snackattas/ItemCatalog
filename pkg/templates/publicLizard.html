@@ -24,12 +24,12 @@
   {% endif %}
 {% endwith %}
 
-{% if changes != [] %}
+{% if recent_activity %}
 <div class="row">
 	<div class="col-md-6 recent-activity">
 <h3>Recent Activity</h3>
 <ul>
-{% for either in changes %}
+{% for either in recent_activity %}
 	{% if either.table == 'lizard' %}
 		{% if either.action == 'new' %}
 			<li>Lizard <a href="{{ url_for('showPublicLizard', _anchor=either.lizard_id) }}"><i>{{either.lizard_name}}</i></a> added <span class="time">{{pretty_date(either.update_instant)}}</span></li>
@@ -59,48 +59,51 @@
 
 <div class="row padding-top padding-bottom"></div>
 
-{% for (number, lizard) in enumerate(lizards) %}
-	{% if number%2 == 0 %}
-		<div class="row">
-			<div class="col-md-6">
-				<div class="row">
-					<div class="col-md-1"></div>
-					<a href = "{{ url_for('showPublicHobby', lizard_id = lizard.id) }}" id={{lizard.id}}>
-						<div class="col-md-10 restaurant-list">
-							<img class="image" src="{{lizard.picture.locate()}}">
-							<figcaption class="text-justify">{{lizard.name}}</figcaption>
-						</div>
-					</a>
-					<div class="col-md-1"></div>
-				</div>
-			</div>
-			{% if number == total_lizards %}
-				</div>
-				<div class="row padding-top padding-bottom"></div>
-			{% endif %}
-	{% endif %}
-	{% if number%2 == 1 %}
+{% for lizard in lizards %}
+<!-- This for loop creates a row with 2 lizards.  This is the left lizard -->
+{% if loop.index%2 == 1 %}
+<div class="row">
 	<div class="col-md-6">
 		<div class="row">
 			<div class="col-md-1"></div>
-				<a href = "{{ url_for('showPublicHobby', lizard_id = lizard.id) }}" id={{lizard.id}}>
-					<div class="col-md-10 restaurant-list">
-						<img class="image" src="{{lizard.picture.locate()}}">
-						<figcaption class="text-justify">{{lizard.name}}</figcaption>
-					</div>
-				</a>
-				<div class="col-md-1"></div>
-			</div>
+			<a href = "{{ url_for('showPublicHobby', lizard_id = lizard.id) }}" id={{lizard.id}}>
+				<div class="col-md-10 restaurant-list">
+					<img class="image" src="{{lizard.picture.locate()}}">
+					<figcaption class="text-justify">{{lizard.name}}</figcaption>
+				</div>
+			</a>
+			<div class="col-md-1"></div>
 		</div>
 	</div>
+{% endif %}
+<!-- This is the right lizard -->
+				{% if loop.index%2 == 0 %}
+				<div class="col-md-6">
+					<div class="row">
+						<div class="col-md-1"></div>
+							<a href = "{{ url_for('showPublicHobby', lizard_id = lizard.id) }}" id={{lizard.id}}>
+								<div class="col-md-10 restaurant-list">
+									<img class="image" src="{{lizard.picture.locate()}}">
+									<figcaption class="text-justify">{{lizard.name}}</figcaption>
+								</div>
+							</a>
+							<div class="col-md-1"></div>
+						</div>
+					</div>
+				</div>
+				<div class="row padding-top padding-bottom"></div>
+				{% endif %}
+<!-- This is for when there are an odd number of lizards -->
+{% if (loop.index == total_lizards) and (loop.index%2 == 1) %}
+	</div>
 	<div class="row padding-top padding-bottom"></div>
-	{% endif %}
+{% endif %}
 {% endfor %}
-{% if lizards == [] %}
+{% if not lizards %}
 	<div class="row">
 		<div class="col-md-1"></div>
 			<div class="col-md-10">
-				<h3>No Lizards Added yet</h3>
+				<h3>No Lizards in Catalog</h3>
 			</div>
 		<div class="col-md-1"></div>
 	</div>

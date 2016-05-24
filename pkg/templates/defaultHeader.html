@@ -1,17 +1,12 @@
 <div class="row top-menu">
 	<div class="col-md-6">
-		<a href="{{url_for('showLizard')}}">
-			<button class="btn btn-default">
-				<span class="glyphicon glyphicon-home" aria-hidden="true"></span>Show All Lizards
-			</button>
+		<a button class="btn btn-default" href="{{url_for('showLizard')}}">
+				<span class="glyphicon glyphicon-home" aria-hidden="true"></span> Show All Lizards
 		</a>
 	</div>
 	<div class="col-md-6 text-right">
-		<a data-toggle="modal" class=".btn-primary" href="{{url_for('showLogin')}}" data-target="#loginModal">
-			<button class="btn btn-default">
-				<span class="glyphicon glyphicon-log-in"></span>
-				Login
-			</button>
+		<a button class="btn btn-default" data-toggle="modal" class=".btn-primary" href="{{url_for('showLogin')}}" data-target="#loginModal">
+			<span class="glyphicon glyphicon-log-in"></span> Login
 		</a>
 		<button class="btn btn-default" data-toggle="modal" data-target=#infoModal>
 			<span class="glyphicon glyphicon-info-sign"></span>

@@ -107,8 +107,6 @@ h3 {
 .top-menu a {
 	margin-bottom: 0;
 	line-height: 16px;
-	font-size: 16px;
-	color: #7B7573;
 	font-weight: 400;
 }
 .divider {
@@ -270,4 +268,8 @@ img.login-img {
 .lizard-header {
 	margin-top: 80px;
 	margin-left: 20px;
+}
+
+.row {
+	margin: 0;
 }

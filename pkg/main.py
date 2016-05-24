@@ -29,12 +29,12 @@ def requires_login(function):
     only when logged in"""
     @wraps(function)
     def decorated_function(*args, **kwargs):
-        if 'username' not in login_session:
+        if "username" not in login_session:
             # Flash error message if trying to access showHobby or other
             # restricted route
-            if function.__name__ != 'showLizard':
-                flash('You need to be signed in to contribute to the database')
-            return redirect(url_for('showPublicLizard'))
+            if function.__name__ != "showLizard":
+                flash("You need to be signed in to contribute to the database")
+            return redirect(url_for("showPublicLizard"))
         return function(*args, **kwargs)
     return decorated_function
 
@@ -45,21 +45,20 @@ def requires_creator(function):
     lizard being edited/deleted"""
     @wraps(function)
     def decorated_function(*args, **kwargs):
-        if 'username' not in login_session:
-            flash('You need to be signed in to contribute to the database')
-            return redirect(url_for('showPublicHobby',
-                            lizard_id=kwargs['lizard_id']))
-        lizard = Lizard.query.filter_by(id=kwargs['lizard_id']).all()
-        if lizard == []:
-            flash('This lizard does not exist or no longer exists')
-            return redirect(url_for('showLizard'))
-        if lizard[0].user_id != login_session['user_id']:
+        if "username" not in login_session:
+            flash("You need to be signed in to contribute to the database")
+            return redirect(url_for("showPublicLizard"))
+        lizard = Lizard.query.filter_by(id=kwargs["lizard_id"]).all()
+        if not lizard:
+            flash("This lizard does not exist or no longer exists")
+            return redirect(url_for("showLizard"))
+        if lizard[0].user_id != login_session["user_id"]:
             # Flash error message if trying to access addHobby, editHobby or
             # deleteHobby
-            if function.__name__ != 'showHobby':
-                flash('Only the creator of this hobby can edit it')
-            return redirect(url_for('showPublicHobby',
-                                    lizard_id=kwargs['lizard_id']))
+            if function.__name__ != "showHobby":
+                flash("Only the creator of this hobby can edit it")
+            return redirect(url_for("showPublicHobby",
+                                    lizard_id=kwargs["lizard_id"]))
         return function(*args, **kwargs)
     return decorated_function
 
@@ -79,14 +78,14 @@ def isURLImage(url):
         error: If url meets qualifications, null will be returned; if url is
                incorrect, a specific error message will be returned
     Example:
-        url = "http://www.google.com/logos/doodles/2015/winter-solstice-2015-brazil-5991092264632320-hp2x.jpg"
+        url = http://www.google.com/logos/doodles/2015/winter-solstice-2015-brazil-5991092264632320-hp2x.jpg"
         (url, error) = IsURLImage(url)
         if error:
-            return render_template('error.html', error=error)
+            return render_template("error.html", error=error)
         """
 
-    acceptable_image_types = ['image/png', 'image/jpeg', 'image/jpg',
-                              'image/svg+xml']
+    acceptable_image_types = ["image/png", "image/jpeg", "image/jpg",
+                              "image/svg+xml"]
     scheme, host, path, params, query, fragment = urlparse.urlparse(url)
     if scheme != "http":
         error = "Only supports HTTP requests: %s" % (url)
@@ -145,7 +144,7 @@ def pretty_date(time=False):
     day_diff = diff.days
 
     if day_diff < 0:
-        return ''
+        return ""
 
     if day_diff == 0:
         if second_diff < 10:
@@ -171,176 +170,171 @@ def pretty_date(time=False):
     return str(day_diff / 365) + " years ago"
 
 
-def changes():
-    """changes: Returns the 10 latest changes (add, delete, update) to
+def recentActivity():
+    """recentActivity: Returns the 10 latest changes (add, delete, update) to
                 lizards and hobbies, in descending order"""
-    changes = ChangeLog.query.\
-        order_by(db.desc('update_instant')).limit(10).all()
-    return changes
+    return ChangeLog.query.order_by(db.desc("update_instant")).limit(10).all()
 
 
 # Public routes, do not require login
-@app.route('/')
-@app.route('/publicLizard/')
+@app.route("/")
+@app.route("/publicLizard/")
 def showPublicLizard():
     """showPublicLizard: Displays lizards, does not require login
 
     Routes:
-        '/'
-        '/publicLizard/'"""
+        "/"
+        "/publicLizard/"""""
     lizards = Lizard.query.order_by(db.asc(Lizard.name)).all()
-    total_lizards = len(lizards) - 1
+    total_lizards = len(lizards)
     with store_context(store):
-        return render_template('publicLizard.html', lizards=lizards,
-                               changes=changes(), pretty_date=pretty_date,
-                               total_lizards=total_lizards,
-                               enumerate=enumerate)
+        return render_template("publicLizard.html", lizards=lizards,
+                               recent_activity=recentActivity(),
+                               pretty_date=pretty_date,
+                               total_lizards=total_lizards)
 
 
-@app.route('/publicLizard/<int:lizard_id>/')
-@app.route('/publicLizard/<int:lizard_id>/publicHobby/')
+@app.route("/publicLizard/<int:lizard_id>/")
 def showPublicHobby(lizard_id):
     """showPublicHobby: Displays hobbies from a particular lizard; does not
                        require login
 
     Arguments are derived from the url"""
-    lizard = Lizard.query.filter_by(id=lizard_id).all()
-    if lizard == []:
-        flash('This lizard does not exist')
-        return render_template('publicHobby.html', hobbies=[], lizard=[],
-                               creator=[], login_session=login_session)
-    creator = User.query.filter_by(id=lizard[0].user_id).one()
+    lizard = Lizard.query.filter_by(id=lizard_id).one()
+    if not lizard:
+        flash("This lizard does not exist")
+        return redirect(url_for("showPublicLizard"))
+    creator = User.query.filter_by(id=lizard.user_id).one()
     hobbies = Hobby.query.\
-        filter_by(lizard_id=lizard[0].id).all()
+        filter_by(lizard_id=lizard.id).all()
     with store_context(store):
         return render_template(
-            'publicHobby.html', hobbies=hobbies, lizard=lizard[0],
+            "publicHobby.html", hobbies=hobbies, lizard=lizard,
             creator=creator, login_session=login_session)
 
 
 # Routes to edit the database, all require login
-@app.route('/lizard/')
+@app.route("/lizard/")
 @requires_login
 def showLizard():
     "showLizard: Displays all lizards; requires login"
     lizards = Lizard.query.order_by(db.asc(Lizard.name)).all()
-    total_lizards = len(lizards) - 1
+    total_lizards = len(lizards)
     with store_context(store):
-        return render_template('lizard.html', lizards=lizards,
-                               login_session=login_session, changes=changes(),
+        return render_template("lizard.html", lizards=lizards,
+                               login_session=login_session,
+                               recent_activity=recentActivity(),
                                pretty_date=pretty_date,
-                               total_lizards=total_lizards,
-                               enumerate=enumerate)
+                               total_lizards=total_lizards)
 
 
-@app.route('/lizard/new/', methods=['GET', 'POST'])
+@app.route("/lizard/new/", methods=["GET", "POST"])
 @requires_login
 def newLizard():
     """newLizard: Displays new lizard creation form and posts new lizard
                     to the database; requires login"""
-    if request.method == 'POST':
-        # First check to see if image URL is valid from HEAD reqauest.
-        # If its not return error
-        url = request.form['url']
-        (url, error) = isURLImage(url)
-        if error:
-            return render_template('newLizard.html',
-                                   login_session=login_session,
-                                   error=error)
-        # urlopen uses a GET request and does not accept HTTPS urls
-        try:
-            url_open = urlopen(url)
-        except:
-            error = "Unable to make a request to this URL: %s" % (url)
-            return render_template('newLizard.html',
-                                   login_session=login_session,
-                                   error=error)
-        # Create Lizard object
-        new_lizard = Lizard(
-            name=request.form['name'],
-            user_id=login_session['user_id'],
-            picture_url=url)
+    if request.method == "GET":
+        return render_template("newLizard.html", login_session=login_session)
+    # First check to see if image URL is valid from HEAD reqauest.
+    # If its not return error
+    url = request.form.get("url")
+    (url, error) = isURLImage(url)
+    if error:
+        return render_template("newLizard.html",
+                               login_session=login_session,
+                               error=error)
+    # urlopen uses a GET request and does not accept HTTPS urls
+    try:
+        url_open = urlopen(url)
+    except:
+        error = "Unable to make a request to this URL: %s" % (url)
+        return render_template("newLizard.html",
+                               login_session=login_session,
+                               error=error)
+    # Create Lizard object
+    new_lizard = Lizard(
+        name=request.form.get("name"),
+        user_id=login_session.get("user_id"),
+        picture_url=url)
 
-        # Must add picture to lizard object within store_context
-        with store_context(store):
-            new_lizard.picture.from_file(url_open)  # adding picture here
-            session.add(new_lizard)
-            session.commit()
-            url_open.close()  # make sure to close url connection after commit
-
-        # After commit, retrieve lizard info to add to the ChangeLog
-        newest_lizard = Lizard.query.\
-            filter_by(user_id=login_session['user_id']).\
-            order_by(db.desc('creation_instant')).limit(1)
-
-        change_log = ChangeLog(
-            user_id=newest_lizard[0].user_id,
-            lizard_name=newest_lizard[0].name,
-            lizard_id=newest_lizard[0].id,
-            update_instant=newest_lizard[0].creation_instant,
-            action="new",
-            table="lizard")
-        session.add(change_log)
-        flash('New Lizard %s Successfully Created' %\
-            (newest_lizard[0].name))
+    # Must add picture to lizard object within store_context
+    with store_context(store):
+        new_lizard.picture.from_file(url_open)  # adding picture here
+        session.add(new_lizard)
         session.commit()
-        return redirect(url_for('showLizard'))
-    else:
-        return render_template('newLizard.html', login_session=login_session)
+        url_open.close()  # make sure to close url connection after commit
+
+    # After commit, retrieve lizard info to add to the ChangeLog
+    newest_lizard = Lizard.query.\
+        filter_by(user_id=login_session.get("user_id")).\
+        order_by(db.desc("creation_instant")).limit(1)[0]
+
+    change_log = ChangeLog(
+        user_id=newest_lizard.user_id,
+        lizard_name=newest_lizard.name,
+        lizard_id=newest_lizard.id,
+        update_instant=newest_lizard.creation_instant,
+        action="new",
+        table="lizard")
+    session.add(change_log)
+    flash("New Lizard %s Successfully Created" %\
+        (newest_lizard.name))
+    session.commit()
+    return redirect(url_for("showLizard"))
 
 
-@app.route('/lizard/<int:lizard_id>/edit/', methods=['GET', 'POST'])
+@app.route("/lizard/<int:lizard_id>/edit/", methods=["GET", "POST"])
 @requires_creator
 def editLizard(lizard_id):
-    """editLizard: Displays form to edit a lizard's name and/or image url
+    """editLizard: Displays form to edit a lizard"s name and/or image url
                      and posts that information to the database; requires login
 
     Arguments are derived from the url"""
     edited_lizard = Lizard.query.filter_by(id=lizard_id).one()
-    if request.method == 'POST':
-        url = request.form['url']
-        (url, error) = isURLImage(url)
-        if error:
-            return render_template('editLizard.html',
-                                   login_session=login_session,
-                                   lizard=edited_lizard,
-                                   error=error)
-        try:
-            url_open = urlopen(url)
-        except:
-            error = "Unable to make a request to this URL: %s" % (url)
-            return render_template('editLizard.html',
-                                   login_session=login_session,
-                                   lizard=edited_lizard,
-                                   error=error)
-
-        change_log = ChangeLog(
-            user_id=edited_lizard.user_id,
-            lizard_name=request.form['name'],
-            lizard_id=lizard_id,
-            update_instant=datetime.datetime.utcnow(),
-            action="update",
-            table="lizard")
-
-        edited_lizard.name = request.form['name']
-        edited_lizard.picture_url = url
-        # Add all info to session while in store_context
+    if request.method == "GET":
         with store_context(store):
-            edited_lizard.picture.from_file(url_open)
-            session.add(change_log)
-            session.add(edited_lizard)
-            flash('Lizard %s Successfully Edited'  % edited_lizard.name)
-            session.commit()
-            url_open.close()
-        return redirect(url_for('showLizard'))
-    else:
-        with store_context(store):
-            return render_template('editLizard.html',
+            return render_template("editLizard.html",
                                    lizard=edited_lizard,
                                    login_session=login_session)
 
+    url = request.form.get("url")
+    (url, error) = isURLImage(url)
+    if error:
+        return render_template("editLizard.html",
+                               login_session=login_session,
+                               lizard=edited_lizard,
+                               error=error)
+    try:
+        url_open = urlopen(url)
+    except:
+        error = "Unable to make a request to this URL: %s" % (url)
+        return render_template("editLizard.html",
+                               login_session=login_session,
+                               lizard=edited_lizard,
+                               error=error)
 
-@app.route('/lizard/<int:lizard_id>/delete/', methods=['GET', 'POST'])
+    change_log = ChangeLog(
+        user_id=edited_lizard.user_id,
+        lizard_name=request.form.get("name"),
+        lizard_id=lizard_id,
+        update_instant=datetime.datetime.utcnow(),
+        action="update",
+        table="lizard")
+
+    edited_lizard.name = request.form.get("name")
+    edited_lizard.picture_url = url
+    # Add all info to session while in store_context
+    with store_context(store):
+        edited_lizard.picture.from_file(url_open)
+        session.add(change_log)
+        session.add(edited_lizard)
+        flash("Lizard %s Successfully Edited"  % edited_lizard.name)
+        session.commit()
+        url_open.close()
+    return redirect(url_for("showLizard"))
+
+
+@app.route("/lizard/<int:lizard_id>/delete/", methods=["GET", "POST"])
 @requires_creator
 def deleteLizard(lizard_id):
     """deleteLizard: Displays form to delete a lizard and posts that
@@ -348,30 +342,31 @@ def deleteLizard(lizard_id):
 
     Arguments are derived from the url"""
     lizard_to_delete = Lizard.query.filter_by(id=lizard_id).one()
-    if request.method == 'POST':
-        change_log = ChangeLog(
-            user_id=lizard_to_delete.user_id,
-            lizard_name=lizard_to_delete.name,
-            update_instant=datetime.datetime.utcnow(),
-            action="delete",
-            table="lizard")
-
-        session.add(change_log)
-        # Delete last, so information is still present to add to ChangeLog
-        session.delete(lizard_to_delete)
-        flash('Lizard %s Successfully Deleted' % lizard_to_delete.name)
-        with store_context(store):
-            session.commit()
-        return redirect(url_for('showLizard'))
-    else:
+    if request.method == "GET":
         with store_context(store):
             return render_template(
-                'deleteLizard.html', lizard=lizard_to_delete,
+                "deleteLizard.html", lizard=lizard_to_delete,
                 login_session=login_session)
 
+    change_log = ChangeLog(
+        user_id=lizard_to_delete.user_id,
+        lizard_name=lizard_to_delete.name,
+        update_instant=datetime.datetime.utcnow(),
+        action="delete",
+        table="lizard")
 
-@app.route('/lizard/<int:lizard_id>/')
-@app.route('/lizard/<int:lizard_id>/hobby/')
+    session.add(change_log)
+
+    Hobby.query.filter_by(lizard_id=lizard_to_delete.id).delete()
+    session.delete(lizard_to_delete)
+    flash("Lizard %s Successfully Deleted" % lizard_to_delete.name)
+    with store_context(store):
+        session.commit()
+    return redirect(url_for("showLizard"))
+
+
+
+@app.route("/lizard/<int:lizard_id>/")
 @requires_creator
 def showHobby(lizard_id):
     """showHobby: Displays all hobbies of a particular lizard; requires login
@@ -385,12 +380,12 @@ def showHobby(lizard_id):
     creator = User.query.filter_by(id=lizard.user_id).one()
     with store_context(store):
         return render_template(
-            'hobby.html', hobbies=hobbies, lizard=lizard,
+            "hobby.html", hobbies=hobbies, lizard=lizard,
             login_session=login_session, creator=creator,
-            user_id=login_session['user_id'])
+            user_id=login_session["user_id"])
 
 
-@app.route('/lizard/<int:lizard_id>/hobby/new/', methods=['GET', 'POST'])
+@app.route("/lizard/<int:lizard_id>/new/", methods=["GET", "POST"])
 @requires_creator
 def newHobby(lizard_id):
     """newHobby: Displays new hobby creation form and posts new hobby to the
@@ -399,64 +394,64 @@ def newHobby(lizard_id):
 
     Arguments are derived from the url"""
     lizard = Lizard.query.filter_by(id=lizard_id).one()
-    if request.method == 'POST':
-        url = request.form['url']
-        (url, error) = isURLImage(url)
-        if error:
-            return render_template('newHobby.html',
-                                   login_session=login_session,
-                                   lizard=lizard,
-                                   error=error)
-        try:
-            url_open = urlopen(url)
-        except:
-            error = "Unable to make a request to this URL: %s" % (url)
-            return render_template('newHobby.html',
-                                   login_session=login_session,
-                                   lizard=lizard,
-                                   error=error)
-
-        new_hobby = Hobby(
-            name=request.form['name'],
-            description=request.form['description'],
-            lizard_id=lizard_id,
-            user_id=lizard.user_id,
-            picture_url=url)
-
+    if request.method == "GET":
         with store_context(store):
-            new_hobby.picture.from_file(url_open)
-            session.add(new_hobby)
-            flash('New Hobby %s Successfully Created' % (new_hobby.name))
-            session.commit()
-            url_open.close()
-
-        newest_hobby = Hobby.query.\
-            filter_by(user_id=lizard.user_id).\
-            order_by(db.desc('creation_instant')).limit(1)
-
-        change_log = ChangeLog(
-            user_id=lizard.user_id,
-            lizard_name=lizard.name,
-            lizard_id=lizard_id,
-            hobby_name=newest_hobby[0].name,
-            hobby_id=newest_hobby[0].id,
-            update_instant=newest_hobby[0].creation_instant,
-            action="new",
-            table="hobby")
-
-        session.add(change_log)
-        session.commit()
-        return redirect(url_for('showHobby', lizard_id=lizard_id))
-    else:
-        with store_context(store):
-            return render_template('newHobby.html',
+            return render_template("newHobby.html",
                                    lizard=lizard,
                                    login_session=login_session)
 
+    url = request.form.get("url")
+    (url, error) = isURLImage(url)
+    if error:
+        return render_template("newHobby.html",
+                               login_session=login_session,
+                               lizard=lizard,
+                               error=error)
+    try:
+        url_open = urlopen(url)
+    except:
+        error = "Unable to make a request to this URL: %s" % (url)
+        return render_template("newHobby.html",
+                               login_session=login_session,
+                               lizard=lizard,
+                               error=error)
+
+    new_hobby = Hobby(
+        name=request.form.get("name"),
+        description=request.form.get("description"),
+        lizard_id=lizard_id,
+        user_id=lizard.user_id,
+        picture_url=url)
+
+    with store_context(store):
+        new_hobby.picture.from_file(url_open)
+        session.add(new_hobby)
+        flash("New Hobby %s Successfully Created" % (new_hobby.name))
+        session.commit()
+        url_open.close()
+
+    newest_hobby = Hobby.query.\
+        filter_by(user_id=lizard.user_id).\
+        order_by(db.desc("creation_instant")).limit(1)[0]
+
+    change_log = ChangeLog(
+        user_id=lizard.user_id,
+        lizard_name=lizard.name,
+        lizard_id=lizard_id,
+        hobby_name=newest_hobby.name,
+        hobby_id=newest_hobby.id,
+        update_instant=newest_hobby.creation_instant,
+        action="new",
+        table="hobby")
+
+    session.add(change_log)
+    session.commit()
+    return redirect(url_for("showHobby", lizard_id=lizard_id))
+
 
 @app.route(
-    '/lizard/<int:lizard_id>/hobby/<int:hobby_id>/edit/',
-    methods=['GET', 'POST'])
+    "/lizard/<int:lizard_id>/<int:hobby_id>/edit/",
+    methods=["GET", "POST"])
 @requires_creator
 def editHobby(lizard_id, hobby_id):
     """editHobby: Displays form to edit a particular hobby's name, description,
@@ -468,64 +463,64 @@ def editHobby(lizard_id, hobby_id):
     lizard = Lizard.query.filter_by(id=lizard_id).one()
     edited_hobby = Hobby.query.\
         filter_by(id=hobby_id, lizard_id=lizard_id).one()
-    if request.method == 'POST':
-        # The ChangeLog for editing hobbies will have an entry if any change is
-        # made to an hobby
-        # But the only metadata collected is the new hobby's name, even if the
-        # name didn't change
-        url = request.form['url']
-        (url, error) = isURLImage(url)
-        if error:
-            return render_template('editHobby.html',
-                                   login_session=login_session,
-                                   lizard_id=lizard_id,
-                                   hobby_id=hobby_id,
-                                   hobby=edited_hobby,
-                                   error=error)
-        try:
-            url_open = urlopen(url)
-        except:
-            error = "Unable to make a request to this URL: %s" % (url)
-            return render_template('editHobby.html',
-                                   login_session=login_session,
-                                   lizard_id=lizard_id,
-                                   hobby_id=hobby_id,
-                                   hobby=edited_hobby,
-                                   error=error)
-
-        change_log = ChangeLog(
-            user_id=edited_hobby.user_id,
-            lizard_name=lizard.name,
-            lizard_id=lizard_id,
-            hobby_name=request.form['name'],
-            hobby_id=hobby_id,
-            update_instant=datetime.datetime.utcnow(),
-            action="update",
-            table="hobby")
-
-        edited_hobby.name = request.form['name']
-        edited_hobby.description = request.form['description']
-        edited_hobby.picture_url = url
-
+    if request.method == "GET":
         with store_context(store):
-            edited_hobby.picture.from_file(url_open)
-            session.add(change_log)
-            flash('Hobby %s Successfully Edited' % (edited_hobby.name))
-            session.commit()
-            url_open.close()
-        return redirect(url_for('showHobby', lizard_id=lizard_id))
-    else:
-        with store_context(store):
-            return render_template('editHobby.html',
+            return render_template("editHobby.html",
                                    lizard=lizard,
                                    hobby_id=hobby_id,
                                    hobby=edited_hobby,
                                    login_session=login_session)
 
+    url = request.form.get("url")
+    (url, error) = isURLImage(url)
+    if error:
+        return render_template("editHobby.html",
+                               login_session=login_session,
+                               lizard_id=lizard_id,
+                               hobby_id=hobby_id,
+                               hobby=edited_hobby,
+                               error=error)
+    try:
+        url_open = urlopen(url)
+    except:
+        error = "Unable to make a request to this URL: %s" % (url)
+        return render_template("editHobby.html",
+                               login_session=login_session,
+                               lizard_id=lizard_id,
+                               hobby_id=hobby_id,
+                               hobby=edited_hobby,
+                               error=error)
+
+    # The ChangeLog for editing hobbies will have an entry if any change is
+    # made to an hobby
+    # But the only metadata collected is the new hobby's name, even if the
+    # name didn"t change
+    change_log = ChangeLog(
+        user_id=edited_hobby.user_id,
+        lizard_name=lizard.name,
+        lizard_id=lizard_id,
+        hobby_name=request.form.get("name"),
+        hobby_id=hobby_id,
+        update_instant=datetime.datetime.utcnow(),
+        action="update",
+        table="hobby")
+
+    edited_hobby.name = request.form.get("name")
+    edited_hobby.description = request.form.get("description")
+    edited_hobby.picture_url = url
+
+    with store_context(store):
+        edited_hobby.picture.from_file(url_open)
+        session.add(change_log)
+        flash("Hobby %s Successfully Edited" % (edited_hobby.name))
+        session.commit()
+        url_open.close()
+    return redirect(url_for("showHobby", lizard_id=lizard_id))
+
 
 @app.route(
-    '/lizard/<int:lizard_id>/hobby/<int:hobby_id>/delete/',
-    methods=['GET', 'POST'])
+    "/lizard/<int:lizard_id>/<int:hobby_id>/delete/",
+    methods=["GET", "POST"])
 @requires_creator
 def deleteHobby(lizard_id, hobby_id):
     """deleteHobby: Displays form to delete an hobby and posts that information
@@ -536,31 +531,31 @@ def deleteHobby(lizard_id, hobby_id):
     lizard = Lizard.query.filter_by(id=lizard_id).one()
     hobby_to_delete = Hobby.query.\
         filter_by(id=hobby_id, lizard_id=lizard_id).one()
-    if request.method == 'POST':
-        change_log = ChangeLog(
-            user_id=hobby_to_delete.user_id,
-            lizard_name=lizard.name,
-            lizard_id=lizard_id,
-            hobby_name=hobby_to_delete.name,
-            update_instant=datetime.datetime.utcnow(),
-            action="delete",
-            table="hobby")
-
-        session.add(change_log)
-        session.delete(hobby_to_delete)
-        flash('Hobby %s Successfully Deleted' % (hobby_to_delete.name))
+    if request.method == "GET":
         with store_context(store):
-            session.commit()
-        return redirect(url_for('showHobby', lizard_id=lizard_id))
-    else:
-        with store_context(store):
-            return render_template('deleteHobby.html', lizard=lizard,
+            return render_template("deleteHobby.html", lizard=lizard,
             hobby=hobby_to_delete, login_session=login_session)
 
+    change_log = ChangeLog(
+        user_id=hobby_to_delete.user_id,
+        lizard_name=lizard.name,
+        lizard_id=lizard_id,
+        hobby_name=hobby_to_delete.name,
+        update_instant=datetime.datetime.utcnow(),
+        action="delete",
+        table="hobby")
 
-@app.route('/error/')
+    session.add(change_log)
+    session.delete(hobby_to_delete)
+    flash("Hobby %s Successfully Deleted" % (hobby_to_delete.name))
+    with store_context(store):
+        session.commit()
+    return redirect(url_for("showHobby", lizard_id=lizard_id))
+
+
+@app.route("/error/")
 @app.errorhandler(304)
 @app.errorhandler(404)
 @app.errorhandler(500)
 def pageNotFound(error):
-    return render_template('pageNotFound.html', error=error), 404
+    return render_template("pageNotFound.html", error=error), 404
